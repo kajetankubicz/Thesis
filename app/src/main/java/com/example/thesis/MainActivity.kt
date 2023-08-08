@@ -38,6 +38,12 @@ import nl.siegmann.epublib.domain.Book
 import nl.siegmann.epublib.epub.EpubReader
 import java.io.IOException
 import java.io.InputStream
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import androidx.compose.foundation.Image
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.drawable.toBitmap
 
 
 class MainActivity : ComponentActivity() {
@@ -52,18 +58,20 @@ class MainActivity : ComponentActivity() {
                     var title by remember { mutableStateOf("") }
                     var author by remember { mutableStateOf("") }
                     var text by remember { mutableStateOf("") }
+                    var coverImageBitmap by remember { mutableStateOf<Bitmap?>(null) }
 
                     LaunchedEffect(Unit) {
                         val epubFileName = "testbook.epub"
                         val assetManager = assets
 
-                        ReadEpubBook.readEpubFromAssets(assetManager, epubFileName) { bookTitle, bookAuthor, bookText ->
+                        ReadEpubBook.readEpubFromAssets(assetManager, epubFileName) { bookTitle, bookAuthor, bookText, coverImage ->
                             title = bookTitle
                             author = bookAuthor
                             text = bookText
+                            coverImageBitmap = coverImage
                         }
                     }
-                    BookInfoScreen(title = title, author = author, text = text)
+                    BookInfoScreen(title = title, author = author, text = text, coverImageBitmap = coverImageBitmap)
                 }
             }
         }
