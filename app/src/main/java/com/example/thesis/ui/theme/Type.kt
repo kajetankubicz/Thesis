@@ -47,6 +47,7 @@ private val VerdanaFontFamily = FontFamily(
 )
 
 val appFontFamilyTypography = Typography(
-    displayLarge = TextStyle(fontFamily = OpenDyslexicFontFamily, fontWeight = FontWeight.W500, fontSize = 30.sp),
+    displayMedium = TextStyle(fontFamily = OpenDyslexicFontFamily, fontWeight = FontWeight.Normal, fontSize = 30.sp),
+    displayLarge = TextStyle(fontFamily = OpenDyslexicFontFamily, fontWeight = FontWeight.Bold, fontSize = 30.sp),
     bodyLarge = TextStyle(fontFamily = HelveticaFontFamily, fontWeight = FontWeight.W500, fontSize = 30.sp)
 )

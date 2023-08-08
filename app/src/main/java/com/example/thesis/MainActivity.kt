@@ -25,6 +25,19 @@ import androidx.compose.ui.unit.dp
 import com.example.BookInfoScreen
 import com.example.thesis.ui.theme.ThesisTheme
 import com.example.ReadEpubBook
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import nl.siegmann.epublib.domain.Book
+import nl.siegmann.epublib.epub.EpubReader
+import java.io.IOException
+import java.io.InputStream
 
 
 class MainActivity : ComponentActivity() {
@@ -38,14 +51,19 @@ class MainActivity : ComponentActivity() {
                 ) {
                     var title by remember { mutableStateOf("") }
                     var author by remember { mutableStateOf("") }
+                    var text by remember { mutableStateOf("") }
 
                     LaunchedEffect(Unit) {
-                        ReadEpubBook.readEpubFromAssets(assets, "testbook.epub") { bookTitle, bookAuthor ->
+                        val epubFileName = "testbook.epub"
+                        val assetManager = assets
+
+                        ReadEpubBook.readEpubFromAssets(assetManager, epubFileName) { bookTitle, bookAuthor, bookText ->
                             title = bookTitle
                             author = bookAuthor
+                            text = bookText
                         }
                     }
-                    BookInfoScreen(title = title, author = author)
+                    BookInfoScreen(title = title, author = author, text = text)
                 }
             }
         }
