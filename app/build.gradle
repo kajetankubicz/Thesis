@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace 'com.example.thesis'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.example.thesis"
         minSdk 21
-        targetSdk 33
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -66,12 +66,14 @@ dependencies {
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
     implementation("org.jsoup:jsoup:1.14.3")
 
-    //epublib
+    //Navigaton
+    implementation("androidx.navigation:navigation-compose:2.7.0")
+
+    //Epublib
     implementation files('libs\\epublib-core-3.1.jar')
     implementation files('libs\\kxml2-2.3.0.jar')
     implementation files('libs\\slf4j-api-1.6.1.jar')
     implementation files('libs\\slf4j-simple-1.6.1.jar')
-    //implementation files('libs\\xmlpull-1.1.3.4d_b4_min.jar')
 }
 
 configurations { all*.exclude group: 'xmlpull', module: 'xmlpull' }
