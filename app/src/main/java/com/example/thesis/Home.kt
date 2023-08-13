@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -21,11 +20,10 @@ fun HomeScreen() {
     val assetManager = LocalContext.current.assets
     Box(modifier = Modifier
         .fillMaxSize()
-        .background(MaterialTheme.colorScheme.primary)
     ){
-        var title by remember { mutableStateOf("") }
-        var author by remember { mutableStateOf("") }
-        var content by remember { mutableStateOf("") }
+        var title by remember { mutableStateOf(" ") }
+        var author by remember { mutableStateOf(" ") }
+        var content by remember { mutableStateOf(" ") }
         var coverImageBitmap by remember { mutableStateOf<Bitmap?>(null) }
 
         LaunchedEffect(Unit) {

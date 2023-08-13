@@ -1,7 +1,6 @@
 package com.example.thesis
 
 import android.content.res.AssetManager
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -11,14 +10,17 @@ import androidx.compose.ui.unit.dp
 import nl.siegmann.epublib.epub.EpubReader
 import java.io.IOException
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.Modifier
 import org.jsoup.Jsoup
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Button
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.asImageBitmap
 
 object ReadEpubBook {
@@ -72,6 +74,8 @@ fun BookInfoScreen(
     content: String,
     coverImageBitmap: Bitmap?
 ) {
+    var isCoverImageClicked by remember { mutableStateOf(false) }
+
     Surface {
         Column {
             if (coverImageBitmap != null) {
@@ -82,6 +86,9 @@ fun BookInfoScreen(
                         .fillMaxWidth()
                         .height(240.dp)
                         .padding(16.dp)
+                        .clickable {
+                            isCoverImageClicked = !isCoverImageClicked
+                        }
                 )
             }
             Text(
@@ -90,23 +97,20 @@ fun BookInfoScreen(
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(16.dp)
             )
-            Text(
-                text = "Authors: $author",
-                style = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(16.dp)
-            )
-            LazyColumn(
-                modifier = Modifier.fillMaxHeight().padding(16.dp),
-                content = {
-                    item {
-                        Text(
-                            text = content,
-                            style = MaterialTheme.typography.bodyLarge
-                        )
+
+            if (isCoverImageClicked) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize().padding(16.dp),
+                    content = {
+                        item {
+                            Text(
+                                text = content,
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                        }
                     }
-                }
-            )
+                )
+            }
         }
     }
 }
