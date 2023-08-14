@@ -1,11 +1,12 @@
 package com.example.thesis
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 
 @Composable
-fun NavigationGraph(navController: NavHostController){
+fun NavigationGraph( navController: NavHostController, context: Context,){
     NavHost(
         navController = navController,
         startDestination = Navigation.Home.route
@@ -17,7 +18,7 @@ fun NavigationGraph(navController: NavHostController){
             FavouritesScreen()
         }
         composable(route = Navigation.Settings.route){
-            SettingsScreen()
+            SettingsScreen(context)
         }
     }
 }
