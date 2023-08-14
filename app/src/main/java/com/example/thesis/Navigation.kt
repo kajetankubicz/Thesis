@@ -4,7 +4,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.ui.graphics.vector.ImageVector
 
 sealed class Navigation(
@@ -27,4 +26,5 @@ sealed class Navigation(
         title = "Settings",
         icon = Icons.Default.Settings
     )
+
 }

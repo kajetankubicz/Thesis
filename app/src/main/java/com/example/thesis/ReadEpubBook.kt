@@ -15,13 +15,20 @@ import org.jsoup.Jsoup
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.navigation.NavHostController
 
 object ReadEpubBook {
     fun readEpubFromAssets(assetManager: AssetManager, epubFileName: String?, onBookInfoReady: (String, String, String, Bitmap?) -> Unit) {
@@ -74,7 +81,6 @@ fun BookInfoScreen(
     content: String,
     coverImageBitmap: Bitmap?
 ) {
-    var isCoverImageClicked by remember { mutableStateOf(false) }
 
     Surface {
         Column {
@@ -86,9 +92,6 @@ fun BookInfoScreen(
                         .fillMaxWidth()
                         .height(240.dp)
                         .padding(16.dp)
-                        .clickable {
-                            isCoverImageClicked = !isCoverImageClicked
-                        }
                 )
             }
             Text(
@@ -98,7 +101,6 @@ fun BookInfoScreen(
                 modifier = Modifier.padding(16.dp)
             )
 
-            if (isCoverImageClicked) {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize().padding(16.dp),
                     content = {
@@ -110,7 +112,30 @@ fun BookInfoScreen(
                         }
                     }
                 )
-            }
+        }
+    }
+}
+
+@Composable
+fun BookCoverItem(
+    coverImageBitmap: Bitmap?,
+    onClick: () -> Unit,
+    ) {
+    Card(
+        modifier = Modifier
+            .padding(8.dp)
+            .clickable(onClick = onClick)
+            .fillMaxSize()
+            .size(240.dp),
+    ) {
+        if (coverImageBitmap != null) {
+            Image(
+                bitmap = coverImageBitmap.asImageBitmap(),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize()
+            )
+        } else {
+            // You can add a placeholder or default image here
         }
     }
 }
