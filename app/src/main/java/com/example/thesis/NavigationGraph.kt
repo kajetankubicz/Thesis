@@ -7,16 +7,19 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 
 @Composable
-fun NavigationGraph(navController: NavHostController, context: Context){
+fun NavigationGraph(navController: NavHostController, context: Context, favoriteBooks: MutableList<BookInfo>){
     NavHost(
         navController = navController,
         startDestination = Navigation.Home.route
+
     ) {
         composable(route = Navigation.Home.route){
-            HomeScreen(navController)
+            HomeScreen(navController, favoriteBooks)
         }
         composable(route = Navigation.Favourites.route){
-            FavouritesScreen()
+            FavouritesScreen(navController) { book ->
+                BookManager.favoriteBooks.remove(book)
+            }
         }
         composable(route = Navigation.Settings.route){
             SettingsScreen(context)
