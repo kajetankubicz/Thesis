@@ -3,18 +3,22 @@ package com.example.thesis
 import android.graphics.Bitmap
 import android.net.Uri
 import android.widget.Toast
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -48,7 +52,53 @@ fun HomeScreen() {
 data class BookInfo(val title: String, val content: String, val coverImageBitmap: Bitmap?)
 
 @Composable
-fun HomeScreen(navController: NavHostController) {
+fun BookCoverItem(
+    coverImageBitmap: Bitmap?,
+    isFavorite: Boolean,
+    onClick: () -> Unit,
+    onFavoriteClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .padding(8.dp)
+            .clickable(onClick = onClick)
+            .fillMaxSize(),
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            if (coverImageBitmap != null) {
+                Image(
+                    bitmap = coverImageBitmap.asImageBitmap(),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize()
+                )
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(8.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(Color.White, shape = CircleShape)
+                            .clickable(onClick = onFavoriteClick),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = if (isFavorite) Icons.Default.Star else Icons.Default.Star,
+                            contentDescription = "Favorite",
+                            tint = if (isFavorite) Color.Red else Color.Gray
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun HomeScreen(navController: NavHostController, favoriteBooks: MutableList<BookInfo>) {
     val assetManager = LocalContext.current.assets
     var books by remember { mutableStateOf(emptyList<BookInfo>()) }
 
@@ -57,13 +107,11 @@ fun HomeScreen(navController: NavHostController) {
         val assetFiles = assetManager.list("") ?: emptyArray()
         val epubFiles = assetFiles.filter { it.endsWith(".epub") }
 
-
         epubFiles.forEach { epubFileName ->
             ReadEpubBook.readEpubFromAssets(assetManager, epubFileName) { title, _, plainText, coverImageBitmap ->
                 bookList.add(BookInfo(title, plainText, coverImageBitmap))
             }
         }
-
         books = bookList
     }
 
@@ -74,14 +122,21 @@ fun HomeScreen(navController: NavHostController) {
             items(books) { book ->
                 BookCoverItem(
                     coverImageBitmap = book.coverImageBitmap,
+                    isFavorite = BookManager.favoriteBooks.contains(book),
                     onClick = {
                         navController.navigate("blank_screen/${book.title}/${Uri.encode(book.content)}") {
                             launchSingleTop = true
                         }
+                    },
+                    onFavoriteClick = {
+                        if (BookManager.favoriteBooks.contains(book)) {
+                            BookManager.favoriteBooks.remove(book)
+                        } else {
+                            BookManager.favoriteBooks.add(book)
+                        }
                     }
                 )
             }
-
         }
     )
 }

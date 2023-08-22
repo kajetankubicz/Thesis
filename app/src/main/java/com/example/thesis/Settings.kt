@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import nl.siegmann.epublib.domain.Book
 import nl.siegmann.epublib.domain.Resource
 import nl.siegmann.epublib.epub.EpubReader
@@ -41,7 +42,11 @@ fun SettingsScreen(context: Context) {
                 Text(text = "Add EPUB Book")
             }
 
-            selectedBook?.let { book ->
+            Text(text = "Aplikacja czytnika e-booków dla dzieci z dysleksją rozwojową", modifier = Modifier.padding(10.dp),fontSize = 25.sp)
+            Text(text = "Opiekun pracy: dr inż. Michał Wróbel", modifier = Modifier.padding(10.dp),fontSize = 25.sp)
+            Text(text = "Dyplomanci: Renata Bańka, Kajetan Kubicz", modifier = Modifier.padding(10.dp),fontSize = 25.sp)
+
+           /* selectedBook?.let { book ->
                 LazyColumn {
                     item {
                         Text(text = "Title: ${book.title}", modifier = Modifier.padding(16.dp))
@@ -62,7 +67,7 @@ fun SettingsScreen(context: Context) {
                         Text(text=Jsoup.parse(chapterContent).text(), style = MaterialTheme.typography.bodyMedium)
                     }
                 }
-            }
+            } */
         }
     }
 }
