@@ -9,16 +9,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.material3.Card
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import nl.siegmann.epublib.domain.Book
 import nl.siegmann.epublib.domain.Resource
 import nl.siegmann.epublib.epub.EpubReader
-import org.jsoup.Jsoup
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
@@ -35,16 +39,39 @@ fun SettingsScreen(context: Context) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.primary)
+            .background(MaterialTheme.colorScheme.surface)
     ) {
         Column {
             Button(onClick = { openDocumentLauncher.launch(arrayOf("application/epub+zip")) }) {
                 Text(text = "Add EPUB Book")
             }
 
-            Text(text = "Aplikacja czytnika e-booków dla dzieci z dysleksją rozwojową", modifier = Modifier.padding(10.dp),fontSize = 25.sp)
-            Text(text = "Opiekun pracy: dr inż. Michał Wróbel", modifier = Modifier.padding(10.dp),fontSize = 25.sp)
-            Text(text = "Dyplomanci: Renata Bańka, Kajetan Kubicz", modifier = Modifier.padding(10.dp),fontSize = 25.sp)
+            Card(modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            border = BorderStroke(2.dp, color = MaterialTheme.colorScheme.onSurface),
+                content = {
+                    Text(
+                        modifier = Modifier
+                            .padding(10.dp),
+                        text = "Aplikacja czytnika e-booków dla dzieci z dysleksją rozwojową",
+                        style = TextStyle(
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = 20.sp,
+                            fontFamily = FontFamily.Monospace,
+                            fontWeight = FontWeight.W800,
+                            fontStyle = FontStyle.Italic,
+                            letterSpacing = 0.10.em,
+                        )
+                    )
+                }
+            )
+            Spacer(modifier = Modifier.size(10.dp))
+
+            Text(text = "Opiekun pracy: dr inż. Michał Wróbel", modifier = Modifier.padding(16.dp),fontSize = 25.sp)
+            Text(text = "Dyplomanci: Renata Bańka, Kajetan Kubicz", modifier = Modifier.padding(16.dp),fontSize = 25.sp)
+
+
 
            /* selectedBook?.let { book ->
                 LazyColumn {
@@ -69,6 +96,7 @@ fun SettingsScreen(context: Context) {
                 }
             } */
         }
+
     }
 }
 
@@ -102,16 +130,4 @@ private fun chapterContentsToString(chapter: Resource): String {
     inputStream.close()
 
     return stringBuilder.toString()
-}
-
-@Preview
-@Composable
-fun PreviewSettingsScreen() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.primary)
-    ) {
-        Text(text = "Sets")
-    }
 }

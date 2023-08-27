@@ -131,11 +131,9 @@ fun BookCoverItem(
         if (coverImageBitmap != null) {
             Image(
                 bitmap = coverImageBitmap.asImageBitmap(),
-                contentDescription = null,
+                contentDescription = "Okładka książki",
                 modifier = Modifier.fillMaxSize()
             )
-        } else {
-            // You can add a placeholder or default image here
         }
     }
 }

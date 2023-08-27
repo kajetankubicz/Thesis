@@ -1,4 +1,5 @@
 package com.example.thesis
+
 import android.content.Context
 import android.net.Uri
 import androidx.compose.runtime.Composable
@@ -15,11 +16,6 @@ fun NavigationGraph(navController: NavHostController, context: Context, favorite
     ) {
         composable(route = Navigation.Home.route){
             HomeScreen(navController, favoriteBooks)
-        }
-        composable(route = Navigation.Favourites.route){
-            FavouritesScreen(navController) { book ->
-                BookManager.favoriteBooks.remove(book)
-            }
         }
         composable(route = Navigation.Settings.route){
             SettingsScreen(context)

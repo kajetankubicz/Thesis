@@ -1,10 +1,11 @@
 package com.example.thesis
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -13,43 +14,49 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.edit
 import androidx.navigation.NavHostController
 
+data class BookInfo(
+    val title: String,
+    val content: String,
+    val coverImageBitmap: Bitmap?,
+)
 
-/*@Composable
-fun HomeScreen() {
-    val assetManager = LocalContext.current.assets
-    Box(modifier = Modifier
-        .fillMaxSize()
-    ){
-        var title by remember { mutableStateOf(" ") }
-        var author by remember { mutableStateOf(" ") }
-        var content by remember { mutableStateOf(" ") }
-        var coverImageBitmap by remember { mutableStateOf<Bitmap?>(null) }
-
-        LaunchedEffect(Unit) {
-            val epubFileName = "testbook.epub"
-
-            ReadEpubBook.readEpubFromAssets(assetManager, epubFileName) { bookTitle, bookAuthor, bookText, coverImage ->
-                title = bookTitle
-                author = bookAuthor
-                content = bookText
-                coverImageBitmap = coverImage
+object BookManager {
+    val favoriteBooks = mutableStateListOf<BookInfo>()
+    fun saveFavorites(context: Context) {
+        val prefs = context.getSharedPreferences("Favorites", Context.MODE_PRIVATE)
+        val favoriteTitles = favoriteBooks.map { it.title }.toSet()
+        prefs.edit {
+            putStringSet("favoriteTitles", favoriteTitles)
+        }
+    }
+    fun loadFavorites(context: Context, allBooks: List<BookInfo>) {
+        val prefs = context.getSharedPreferences("Favorites", Context.MODE_PRIVATE)
+        val favoriteTitles = prefs.getStringSet("favoriteTitles", emptySet())
+        favoriteBooks.clear()
+        favoriteTitles?.forEach { title ->
+            val book = allBooks.find { it.title == title }
+            book?.let {
+                favoriteBooks.add(it)
             }
         }
-        BookInfoScreen(title = title, author = author, content = content, coverImageBitmap = coverImageBitmap)
     }
-}*/
-
-data class BookInfo(val title: String, val content: String, val coverImageBitmap: Bitmap?)
+}
 
 @Composable
 fun BookCoverItem(
@@ -58,21 +65,34 @@ fun BookCoverItem(
     onClick: () -> Unit,
     onFavoriteClick: () -> Unit
 ) {
+
     Card(
         modifier = Modifier
-            .padding(8.dp)
+            .padding(10.dp)
             .clickable(onClick = onClick)
-            .fillMaxSize(),
+            .fillMaxSize()
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.onSurface,
+                shape = MaterialTheme.shapes.large,
+            ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
     ) {
-        Box(
-            modifier = Modifier.fillMaxSize()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
         ) {
-            if (coverImageBitmap != null) {
-                Image(
-                    bitmap = coverImageBitmap.asImageBitmap(),
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize()
-                )
+            Box(modifier = Modifier.fillMaxSize()) {
+                if (coverImageBitmap != null) {
+                    Image(
+                        bitmap = coverImageBitmap.asImageBitmap(),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(260.dp),
+                        contentScale = ContentScale.Crop
+                    )
+                }
                 Box(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
@@ -81,14 +101,17 @@ fun BookCoverItem(
                     Box(
                         modifier = Modifier
                             .size(40.dp)
-                            .background(Color.White, shape = CircleShape)
-                            .clickable(onClick = onFavoriteClick),
+                            .background(color = MaterialTheme.colorScheme.onSurface.copy(0.8f), shape = CircleShape)
+                            .clickable {
+                                onFavoriteClick()
+                            },
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = if (isFavorite) Icons.Default.Star else Icons.Default.Star,
                             contentDescription = "Favorite",
-                            tint = if (isFavorite) Color.Red else Color.Gray
+                            tint = if (isFavorite) Color.Red.copy(0.75f) else Color.Gray.copy(0.9f),
+                            modifier = Modifier.size(35.dp)
                         )
                     }
                 }
@@ -98,9 +121,13 @@ fun BookCoverItem(
 }
 
 @Composable
-fun HomeScreen(navController: NavHostController, favoriteBooks: MutableList<BookInfo>) {
+fun HomeScreen(
+    navController: NavHostController,
+    favoriteBooks: MutableList<BookInfo>,
+) {
+    val context = LocalContext.current
     val assetManager = LocalContext.current.assets
-    var books by remember { mutableStateOf(emptyList<BookInfo>()) }
+    var books by remember { mutableStateOf(favoriteBooks.toMutableList()) }
 
     LaunchedEffect(Unit) {
         val bookList = mutableListOf<BookInfo>()
@@ -113,13 +140,25 @@ fun HomeScreen(navController: NavHostController, favoriteBooks: MutableList<Book
             }
         }
         books = bookList
+
+        BookManager.loadFavorites(context, bookList)
     }
 
+    val (favoriteBooksList, nonFavoriteBooksList) = books.partition {
+        BookManager.favoriteBooks.contains(it)
+    }
+
+    val sortedBooks = favoriteBooksList + nonFavoriteBooksList
+
+
     LazyVerticalGrid(
-        modifier = Modifier.padding(top = 20.dp, bottom = 100.dp).fillMaxSize(),
+        modifier = Modifier
+            .padding(bottom = 80.dp)
+            .fillMaxSize()
+            .background(color = MaterialTheme.colorScheme.surface),
         columns = GridCells.Fixed(2),
         content = {
-            items(books) { book ->
+            items(sortedBooks) { book ->
                 BookCoverItem(
                     coverImageBitmap = book.coverImageBitmap,
                     isFavorite = BookManager.favoriteBooks.contains(book),
@@ -134,15 +173,10 @@ fun HomeScreen(navController: NavHostController, favoriteBooks: MutableList<Book
                         } else {
                             BookManager.favoriteBooks.add(book)
                         }
+                        BookManager.saveFavorites(context)
                     }
                 )
             }
         }
     )
 }
-
-
-
-
-
-

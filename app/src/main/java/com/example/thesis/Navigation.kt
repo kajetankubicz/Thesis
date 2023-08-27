@@ -16,11 +16,6 @@ sealed class Navigation(
         title = "Home",
         icon = Icons.Default.Home
     )
-    object Favourites: Navigation(
-        route = "favourites",
-        title = "Favourites",
-        icon = Icons.Default.Star
-    )
     object Settings: Navigation(
         route = "settings",
         title = "Settings",
