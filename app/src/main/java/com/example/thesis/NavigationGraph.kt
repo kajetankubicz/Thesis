@@ -20,10 +20,11 @@ fun NavigationGraph(navController: NavHostController, context: Context, favorite
         composable(route = Navigation.Settings.route){
             SettingsScreen(context)
         }
-        composable(route = "blank_screen/{title}/{content}") { backStackEntry ->
+        composable(
+            route = "BookDetailsScreen/{title}/{content}") { backStackEntry ->
             val title = backStackEntry.arguments?.getString("title")
             val content = Uri.decode(backStackEntry.arguments?.getString("content") ?: "")
-            BlankScreen(title ?: "", content, navController::popBackStack)
+            BookDetailsScreen(title ?: "", content, navController::popBackStack)
         }
     }
 }

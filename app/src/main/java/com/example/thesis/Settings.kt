@@ -10,9 +10,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.Switch
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -36,6 +38,7 @@ fun SettingsScreen(context: Context) {
         selectedBook = uri?.let { readEpubFile(context, it) }
     }
 
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -45,6 +48,7 @@ fun SettingsScreen(context: Context) {
             Button(onClick = { openDocumentLauncher.launch(arrayOf("application/epub+zip")) }) {
                 Text(text = "Add EPUB Book")
             }
+
 
             Card(modifier = Modifier
                 .fillMaxWidth()
@@ -99,6 +103,7 @@ fun SettingsScreen(context: Context) {
 
     }
 }
+
 
 private fun readEpubFile(context: Context, uri: Uri): Book? {
     val inputStream = context.contentResolver.openInputStream(uri)

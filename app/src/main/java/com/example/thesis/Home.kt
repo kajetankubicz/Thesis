@@ -163,7 +163,7 @@ fun HomeScreen(
                     coverImageBitmap = book.coverImageBitmap,
                     isFavorite = BookManager.favoriteBooks.contains(book),
                     onClick = {
-                        navController.navigate("blank_screen/${book.title}/${Uri.encode(book.content)}") {
+                        navController.navigate("BookDetailsScreen/${book.title}/${Uri.encode(book.content)}") {
                             launchSingleTop = true
                         }
                     },

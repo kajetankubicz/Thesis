@@ -12,6 +12,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -19,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -38,7 +40,7 @@ fun MainScreen(){
 
     Scaffold(
         bottomBar = {
-            if (currentDestination != "blank_screen") {
+            if (currentDestination != "BookDetailsScreen/{title}/{content}") {
                 BottomBar(navController = navController)
             }
         }
@@ -58,7 +60,7 @@ fun BottomBar(navController: NavHostController){
     val currentDestination = navBackStackEntry?.destination?.route
 
     NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(6.dp),
         contentColor = MaterialTheme.colorScheme.onSurface,
     ) {
         screens.forEach { screen ->
