@@ -3,6 +3,8 @@ package com.example.thesis
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
+import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -14,10 +16,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,6 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import androidx.navigation.NavHostController
+import com.example.thesis.Navigation.Home.title
 
 data class BookInfo(
     val title: String,
@@ -124,13 +124,27 @@ fun BookCoverItem(
 fun HomeScreen(
     navController: NavHostController,
     favoriteBooks: MutableList<BookInfo>,
+    launcher: ActivityResultLauncher<String>
 ) {
     val context = LocalContext.current
     val assetManager = LocalContext.current.assets
-    var books by remember { mutableStateOf(favoriteBooks.toMutableList()) }
+    //var books by remember { mutableStateOf(favoriteBooks.toMutableList()) }
+    var books by remember { mutableStateOf(emptyList<BookInfo>()) }
+    val addedBooks = remember { mutableStateListOf<BookInfo>() }
 
-    LaunchedEffect(Unit) {
+    val savedBooks = remember {
+        mutableStateOf(
+            BookManager.favoriteBooks.toList()
+        )
+    }
+    val homeScreenFavoriteBooks = remember { mutableStateOf<List<BookInfo>>(emptyList()) }
+
+    LaunchedEffect(Unit, favoriteBooks, homeScreenFavoriteBooks, addedBooks) {
         val bookList = mutableListOf<BookInfo>()
+        bookList.addAll(savedBooks.value)
+        bookList.addAll(favoriteBooks)
+        bookList.addAll(homeScreenFavoriteBooks.value)
+        bookList.addAll(addedBooks)
         val assetFiles = assetManager.list("") ?: emptyArray()
         val epubFiles = assetFiles.filter { it.endsWith(".epub") }
 
@@ -139,6 +153,7 @@ fun HomeScreen(
                 bookList.add(BookInfo(title, plainText, coverImageBitmap))
             }
         }
+        //bookList.addAll(savedBooks.value)
         books = bookList
 
         BookManager.loadFavorites(context, bookList)
@@ -177,6 +192,24 @@ fun HomeScreen(
                     }
                 )
             }
+            item {
+                Button(
+                    onClick = {
+                        launcher.launch("application/epub+zip") // Change the MIME type as needed
+                    },
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth()
+                ) {
+                    Text("Add Book")
+                }
+            }
         }
     )
 }
+
+
+
+
+
+

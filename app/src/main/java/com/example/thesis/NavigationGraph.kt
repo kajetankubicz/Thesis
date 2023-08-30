@@ -2,20 +2,21 @@ package com.example.thesis
 
 import android.content.Context
 import android.net.Uri
+import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 
 @Composable
-fun NavigationGraph(navController: NavHostController, context: Context, favoriteBooks: MutableList<BookInfo>){
+fun NavigationGraph(navController: NavHostController, context: Context, favoriteBooks: MutableList<BookInfo>, launcher: ActivityResultLauncher<String>){
     NavHost(
         navController = navController,
         startDestination = Navigation.Home.route
 
     ) {
         composable(route = Navigation.Home.route){
-            HomeScreen(navController, favoriteBooks)
+            HomeScreen(navController, favoriteBooks, launcher)
         }
         composable(route = Navigation.Settings.route){
             SettingsScreen(context)
