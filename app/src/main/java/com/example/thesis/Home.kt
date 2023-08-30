@@ -3,6 +3,7 @@ package com.example.thesis
 import android.graphics.Bitmap
 import android.net.Uri
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -71,7 +73,8 @@ fun BookCoverItem(
                 Image(
                     bitmap = coverImageBitmap.asImageBitmap(),
                     contentDescription = null,
-                    modifier = Modifier.fillMaxSize()
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.width(200.dp).height(270.dp)
                 )
                 Box(
                     modifier = Modifier
@@ -98,12 +101,24 @@ fun BookCoverItem(
 }
 
 @Composable
-fun HomeScreen(navController: NavHostController, favoriteBooks: MutableList<BookInfo>) {
+fun HomeScreen(navController: NavHostController, favoriteBooks: MutableList<BookInfo>, launcher: ActivityResultLauncher<String>) {
     val assetManager = LocalContext.current.assets
     var books by remember { mutableStateOf(emptyList<BookInfo>()) }
+    val addedBooks = remember { mutableStateListOf<BookInfo>() }
 
-    LaunchedEffect(Unit) {
+    val savedBooks = remember {
+        mutableStateOf(
+            BookManager.favoriteBooks.toList()
+        )
+    }
+    val homeScreenFavoriteBooks = remember { mutableStateOf<List<BookInfo>>(emptyList()) }
+
+    LaunchedEffect(Unit, favoriteBooks, homeScreenFavoriteBooks, addedBooks) {
         val bookList = mutableListOf<BookInfo>()
+        bookList.addAll(savedBooks.value)
+        bookList.addAll(favoriteBooks)
+        bookList.addAll(homeScreenFavoriteBooks.value)
+        bookList.addAll(addedBooks)
         val assetFiles = assetManager.list("") ?: emptyArray()
         val epubFiles = assetFiles.filter { it.endsWith(".epub") }
 
@@ -112,6 +127,7 @@ fun HomeScreen(navController: NavHostController, favoriteBooks: MutableList<Book
                 bookList.add(BookInfo(title, plainText, coverImageBitmap))
             }
         }
+        //bookList.addAll(savedBooks.value)
         books = bookList
     }
 
@@ -136,6 +152,18 @@ fun HomeScreen(navController: NavHostController, favoriteBooks: MutableList<Book
                         }
                     }
                 )
+            }
+            item {
+                Button(
+                    onClick = {
+                        launcher.launch("application/epub+zip") // Change the MIME type as needed
+                    },
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth()
+                ) {
+                    Text("Add Book")
+                }
             }
         }
     )
