@@ -79,6 +79,12 @@ dependencies {
     implementation files('libs\\kxml2-2.3.0.jar')
     implementation files('libs\\slf4j-api-1.6.1.jar')
     implementation files('libs\\slf4j-simple-1.6.1.jar')
+
+    //Paging
+    implementation "androidx.paging:paging-compose:1.0.0-alpha12"
+
+
+
 }
 
 configurations { all*.exclude group: 'xmlpull', module: 'xmlpull' }

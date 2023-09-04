@@ -1,6 +1,7 @@
 package com.example.thesis
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,13 +12,21 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+
 
 @Composable
-fun FavouritesScreen(navController: NavHostController, onRemoveFromFavorites: (BookInfo) -> Unit) {
-    val favoriteBooks = BookManager.favoriteBooks
+fun FavouritesScreen(
+    navController: NavHostController,
+) {
+    /*val favoriteBooks = BookManager.favoriteBooks
+
 
     Box(
         modifier = Modifier
@@ -38,11 +47,11 @@ fun FavouritesScreen(navController: NavHostController, onRemoveFromFavorites: (B
                             }
                                   },
                         onFavoriteClick = {
-                            onRemoveFromFavorites(book)
+                            BookManager.favoriteBooks.remove(book)
                         }
                     )
                 }
             }
         )
-    }
+    }*/
 }

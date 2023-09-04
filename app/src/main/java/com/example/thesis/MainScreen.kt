@@ -1,6 +1,10 @@
 package com.example.thesis
 
 import android.annotation.SuppressLint
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
@@ -16,6 +20,7 @@ import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,6 +30,10 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import nl.siegmann.epublib.epub.EpubReader
+import org.jsoup.Jsoup
+import java.io.IOException
+import java.io.InputStream
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -35,7 +44,6 @@ fun MainScreen(){
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination?.route
     val context = LocalContext.current
-
     val favoriteBooks = remember { mutableStateListOf<BookInfo>()}
 
     Scaffold(
@@ -47,6 +55,42 @@ fun MainScreen(){
     ) {
         NavigationGraph(navController = navController, context, favoriteBooks)
     }
+}
+
+fun readEpubFromInputStream(inputStream: InputStream): BookInfo {
+    val bookTitle: String
+    val bookPlainText: String
+    var coverImageBitmap: Bitmap? = null
+
+    try {
+        val book = EpubReader().readEpub(inputStream)
+
+        bookTitle = book.title ?: "Unknown Title"
+        val content = StringBuilder()
+
+        for (resource in book.contents) {
+            content.append(resource.reader.readText())
+        }
+
+        bookPlainText = Jsoup.parse(content.toString()).text()
+
+        for (resource in book.resources.all) {
+            if (resource.mediaType?.toString()?.startsWith("image/") == true) {
+                val coverStream = resource.inputStream
+                coverImageBitmap = BitmapFactory.decodeStream(coverStream)
+                coverStream.close()
+                break
+            }
+        }
+
+        inputStream.close()
+
+    } catch (e: IOException) {
+        e.printStackTrace()
+        throw e
+    }
+
+    return BookInfo(bookTitle, bookPlainText, coverImageBitmap)
 }
 
 

@@ -45,11 +45,6 @@ fun SettingsScreen(context: Context) {
             .background(MaterialTheme.colorScheme.surface)
     ) {
         Column {
-            Button(onClick = { openDocumentLauncher.launch(arrayOf("application/epub+zip")) }) {
-                Text(text = "Add EPUB Book")
-            }
-
-
             Card(modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),

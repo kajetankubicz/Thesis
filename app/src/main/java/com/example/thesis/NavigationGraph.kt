@@ -2,7 +2,9 @@ package com.example.thesis
 
 import android.content.Context
 import android.net.Uri
+import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable

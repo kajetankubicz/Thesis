@@ -3,6 +3,7 @@ package com.example.thesis
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -21,7 +22,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -29,6 +29,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import androidx.navigation.NavHostController
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
 
 data class BookInfo(
     val title: String,
@@ -101,7 +104,10 @@ fun BookCoverItem(
                     Box(
                         modifier = Modifier
                             .size(40.dp)
-                            .background(color = MaterialTheme.colorScheme.onSurface.copy(0.8f), shape = CircleShape)
+                            .background(
+                                color = MaterialTheme.colorScheme.onSurface.copy(0.8f),
+                                shape = CircleShape
+                            )
                             .clickable {
                                 onFavoriteClick()
                             },
@@ -127,10 +133,20 @@ fun HomeScreen(
 ) {
     val context = LocalContext.current
     val assetManager = LocalContext.current.assets
-    var books by remember { mutableStateOf(favoriteBooks.toMutableList()) }
 
-    LaunchedEffect(Unit) {
+    var books by remember { mutableStateOf(emptyList<BookInfo>()) }
+
+    val (favoriteBooksList, nonFavoriteBooksList) = books.partition {
+        BookManager.favoriteBooks.contains(it)
+    }
+
+    val sortedBooks = favoriteBooksList + nonFavoriteBooksList
+
+    LaunchedEffect(Unit, favoriteBooks) {
         val bookList = mutableListOf<BookInfo>()
+        bookList.addAll(BookManager.favoriteBooks)
+        bookList.addAll(favoriteBooks)
+
         val assetFiles = assetManager.list("") ?: emptyArray()
         val epubFiles = assetFiles.filter { it.endsWith(".epub") }
 
@@ -139,44 +155,92 @@ fun HomeScreen(
                 bookList.add(BookInfo(title, plainText, coverImageBitmap))
             }
         }
+
         books = bookList
 
         BookManager.loadFavorites(context, bookList)
     }
 
-    val (favoriteBooksList, nonFavoriteBooksList) = books.partition {
-        BookManager.favoriteBooks.contains(it)
-    }
 
-    val sortedBooks = favoriteBooksList + nonFavoriteBooksList
-
-
-    LazyVerticalGrid(
+    Box(
         modifier = Modifier
-            .padding(bottom = 80.dp)
             .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.surface),
-        columns = GridCells.Fixed(2),
-        content = {
-            items(sortedBooks) { book ->
-                BookCoverItem(
-                    coverImageBitmap = book.coverImageBitmap,
-                    isFavorite = BookManager.favoriteBooks.contains(book),
-                    onClick = {
-                        navController.navigate("BookDetailsScreen/${book.title}/${Uri.encode(book.content)}") {
-                            launchSingleTop = true
+    ) {
+        LazyVerticalGrid(
+            modifier = Modifier
+                .padding(bottom = 80.dp)
+                .fillMaxSize()
+                .background(color = MaterialTheme.colorScheme.surface),
+            columns = GridCells.Fixed(2),
+            content = {
+                items(sortedBooks) { book ->
+                    BookCoverItem(
+                        coverImageBitmap = book.coverImageBitmap,
+                        isFavorite = BookManager.favoriteBooks.contains(book),
+                        onClick = {
+                            navController.navigate(
+                                "BookDetailsScreen/${book.title}/${
+                                    Uri.encode(
+                                        book.content
+                                    )
+                                }"
+                            ) {
+                                launchSingleTop = true
+                            }
+                        },
+                        onFavoriteClick = {
+                            if (BookManager.favoriteBooks.contains(book)) {
+                                BookManager.favoriteBooks.remove(book)
+                            } else {
+                                BookManager.favoriteBooks.add(book)
+                            }
+                            BookManager.saveFavorites(context)
                         }
-                    },
-                    onFavoriteClick = {
-                        if (BookManager.favoriteBooks.contains(book)) {
-                            BookManager.favoriteBooks.remove(book)
-                        } else {
-                            BookManager.favoriteBooks.add(book)
-                        }
-                        BookManager.saveFavorites(context)
+                    )
+                }
+            }
+        )
+
+        val selectedEpubFile = remember { mutableStateOf<Uri?>(null) }
+
+        val updatedSelectedEpubFile = rememberUpdatedState(selectedEpubFile.value)
+
+        val filePickerLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.GetContent()
+        ) { uri: Uri? ->
+            selectedEpubFile.value = uri
+        }
+
+
+        FloatingActionButton(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(bottom = 80.dp)
+                .padding(16.dp),
+            onClick = {
+                filePickerLauncher.launch("application/epub+zip")
+
+            },
+            containerColor = MaterialTheme.colorScheme.onSurface,
+            contentColor = MaterialTheme.colorScheme.surface
+        ) {
+            Icon(Icons.Filled.Add, "Add book")
+
+        }
+
+        if (selectedEpubFile.value != null) {
+            LaunchedEffect(selectedEpubFile.value) {
+                val epubUri = updatedSelectedEpubFile.value
+                if (epubUri != null) {
+                    val inputStream = context.contentResolver.openInputStream(epubUri)
+                    if (inputStream != null) {
+                        val newBook = readEpubFromInputStream(inputStream)
+                        books = books + newBook
+                        selectedEpubFile.value = null
                     }
-                )
+                }
             }
         }
-    )
+    }
 }
+
