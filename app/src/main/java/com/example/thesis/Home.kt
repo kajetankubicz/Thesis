@@ -4,10 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -15,10 +11,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,8 +22,12 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import androidx.navigation.NavHostController
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.*
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.*
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType.Companion.LongPress
+import androidx.compose.ui.input.pointer.pointerInput
+
 
 data class BookInfo(
     val title: String,
@@ -61,18 +57,26 @@ object BookManager {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BookCoverItem(
     coverImageBitmap: Bitmap?,
     isFavorite: Boolean,
     onClick: () -> Unit,
-    onFavoriteClick: () -> Unit
+    onFavoriteClick: () -> Unit,
+    onDeleteClick: () -> Unit
 ) {
+    val isLongPressed = remember { mutableStateOf(false) }
 
     Card(
         modifier = Modifier
             .padding(10.dp)
-            .clickable(onClick = onClick)
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = {
+                    isLongPressed.value = true
+                }
+            )
             .fillMaxSize()
             .border(
                 width = 1.dp,
@@ -123,6 +127,34 @@ fun BookCoverItem(
                 }
             }
         }
+    }
+    if (isLongPressed.value) {
+        AlertDialog(
+            onDismissRequest = { isLongPressed.value = false },
+            title = { Text(text = "Usunąć książkę?") },
+            text = {
+                Text(text = "Czy na pewno chcesz usunąć tę książkę?")
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onDeleteClick()
+                        isLongPressed.value = false
+                    },
+                ) {
+                    Text(text = "Tak")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = {
+                        isLongPressed.value = false
+                    },
+                ) {
+                    Text(text = "Nie")
+                }
+            }
+        )
     }
 }
 
@@ -195,8 +227,15 @@ fun HomeScreen(
                                 BookManager.favoriteBooks.add(book)
                             }
                             BookManager.saveFavorites(context)
+                        },
+                        onDeleteClick = {
+                            // Usuń książkę z listy i odśwież wyświetlanie
+                            books = books.filterNot { it == book }
+                            BookManager.favoriteBooks.remove(book)
+                            BookManager.saveFavorites(context)
                         }
                     )
+
                 }
             }
         )

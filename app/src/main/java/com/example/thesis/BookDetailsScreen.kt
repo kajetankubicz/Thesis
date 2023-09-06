@@ -27,10 +27,14 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 
 object LastViewedPage {
     class BookDetailsViewModel : ViewModel() {
@@ -56,7 +60,8 @@ object LastViewedPage {
 fun BookDetailsScreen(
     title: String,
     content: String,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    navController: NavHostController
 ) {
     val viewModel: LastViewedPage.BookDetailsViewModel = viewModel()
     val context = LocalContext.current
@@ -94,7 +99,7 @@ fun BookDetailsScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = {navController.navigate("BooksScreen")}) {
                         Icon(Icons.Filled.MoreVert, tint = MaterialTheme.colorScheme.onSurface, contentDescription = "More vert")
                     }
                 }
@@ -114,7 +119,11 @@ fun BookDetailsScreen(
                     item {
                         Text(
                             text = pageContent,
-                            style = TextStyle(fontSize = 20.sp),
+                            style = TextStyle(
+                                fontFamily = FontFamily(Font(R.font.open_dyslexic3_bold)),
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Normal // Możesz dostosować wagę czcionki
+                            ),
                             modifier = Modifier.fillMaxWidth(),
                         )
                     }
