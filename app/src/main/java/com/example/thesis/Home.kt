@@ -229,7 +229,6 @@ fun HomeScreen(
                             BookManager.saveFavorites(context)
                         },
                         onDeleteClick = {
-                            // Usuń książkę z listy i odśwież wyświetlanie
                             books = books.filterNot { it == book }
                             BookManager.favoriteBooks.remove(book)
                             BookManager.saveFavorites(context)

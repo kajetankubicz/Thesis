@@ -39,6 +39,7 @@ import androidx.navigation.NavHostController
 object LastViewedPage {
     class BookDetailsViewModel : ViewModel() {
         var currentPage: Int = 0
+        var selectedFontFamily: FontFamily = FontFamily(Font(R.font.open_dyslexic3_bold))
     }
     fun saveLastViewedPage(context: Context, bookIdentifier: String, pageIndex: Int) {
         val sharedPreferences = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
@@ -61,9 +62,10 @@ fun BookDetailsScreen(
     title: String,
     content: String,
     onNavigateBack: () -> Unit,
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: LastViewedPage.BookDetailsViewModel
 ) {
-    val viewModel: LastViewedPage.BookDetailsViewModel = viewModel()
+   // val viewModel: LastViewedPage.BookDetailsViewModel = viewModel()
     val context = LocalContext.current
 
     val pages = splitContentIntoPages(content)
@@ -120,9 +122,9 @@ fun BookDetailsScreen(
                         Text(
                             text = pageContent,
                             style = TextStyle(
-                                fontFamily = FontFamily(Font(R.font.open_dyslexic3_bold)),
+                                fontFamily = viewModel.selectedFontFamily,
                                 fontSize = 20.sp,
-                                fontWeight = FontWeight.Normal // Możesz dostosować wagę czcionki
+                                fontWeight = FontWeight.Normal
                             ),
                             modifier = Modifier.fillMaxWidth(),
                         )

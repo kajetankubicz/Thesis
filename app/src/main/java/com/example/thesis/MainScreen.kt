@@ -39,7 +39,7 @@ import java.io.InputStream
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(){
+fun MainScreen(viewModel: LastViewedPage.BookDetailsViewModel){
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination?.route
@@ -53,7 +53,7 @@ fun MainScreen(){
             }
         }
     ) {
-        NavigationGraph(navController = navController, context, favoriteBooks)
+        NavigationGraph(navController = navController, context, favoriteBooks, viewModel)
     }
 }
 

@@ -11,7 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 
 @Composable
-fun NavigationGraph(navController: NavHostController, context: Context, favoriteBooks: MutableList<BookInfo>){
+fun NavigationGraph(navController: NavHostController, context: Context, favoriteBooks: MutableList<BookInfo>, viewModel: LastViewedPage.BookDetailsViewModel){
     val backStackEntry = navController.currentBackStackEntryAsState()
     val previousRoute = backStackEntry.value?.destination?.route
     NavHost(
@@ -27,13 +27,14 @@ fun NavigationGraph(navController: NavHostController, context: Context, favorite
         }
         composable(
             route = "BookDetailsScreen/{title}/{content}") { backStackEntry ->
-            val title = backStackEntry.arguments?.getString("title")
+            val title = backStackEntry.arguments?.getString("title") ?: ""
             val content = Uri.decode(backStackEntry.arguments?.getString("content") ?: "")
-            BookDetailsScreen(title ?: "", content, navController::popBackStack, navController)
+            BookDetailsScreen(title, content, { navController.popBackStack() }, navController, viewModel)
         }
         composable(route = "BooksScreen") {
             TxtConfigure(
-                onNavigateBack = { navController.popBackStack() }
+                onNavigateBack = { navController.popBackStack() },
+                viewModel = viewModel
             )
         }
     }
