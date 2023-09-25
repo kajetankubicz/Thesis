@@ -27,6 +27,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType.Companion.LongPress
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.sp
 
 
 data class BookInfo(
@@ -37,6 +39,9 @@ data class BookInfo(
 
 object BookManager {
     val favoriteBooks = mutableStateListOf<BookInfo>()
+    var selectedFontSize by mutableStateOf(20.sp)
+    var selectedFontFamily by mutableStateOf<FontFamily?>(null)
+
     fun saveFavorites(context: Context) {
         val prefs = context.getSharedPreferences("Favorites", Context.MODE_PRIVATE)
         val favoriteTitles = favoriteBooks.map { it.title }.toSet()

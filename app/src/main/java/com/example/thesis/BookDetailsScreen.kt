@@ -22,8 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.surfaceColorAtElevation
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
@@ -50,7 +49,7 @@ object LastViewedPage {
 
     fun getLastViewedPage(context: Context, bookIdentifier: String): Int {
         val sharedPreferences = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
-        return sharedPreferences.getInt("lastViewedPage_$bookIdentifier", 0) // 0 is the default value if the key is not found
+        return sharedPreferences.getInt("lastViewedPage_$bookIdentifier", 0)
     }
 }
 
@@ -65,8 +64,9 @@ fun BookDetailsScreen(
     navController: NavHostController,
     viewModel: LastViewedPage.BookDetailsViewModel
 ) {
-   // val viewModel: LastViewedPage.BookDetailsViewModel = viewModel()
+    val viewModel: LastViewedPage.BookDetailsViewModel = viewModel()
     val context = LocalContext.current
+    var selectedFontSize by mutableStateOf(20.sp)
 
     val pages = splitContentIntoPages(content)
     val bookIdentifier = title
@@ -122,8 +122,8 @@ fun BookDetailsScreen(
                         Text(
                             text = pageContent,
                             style = TextStyle(
-                                fontFamily = viewModel.selectedFontFamily,
-                                fontSize = 20.sp,
+                                fontFamily = BookManager.selectedFontFamily ?: FontFamily.Default,
+                                fontSize = BookManager.selectedFontSize,
                                 fontWeight = FontWeight.Normal
                             ),
                             modifier = Modifier.fillMaxWidth(),
