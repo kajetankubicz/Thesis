@@ -22,8 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.surfaceColorAtElevation
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
@@ -36,26 +35,26 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 
-object LastViewedPage {
+object OstatniaStrona {
     class BookDetailsViewModel : ViewModel() {
         var currentPage: Int = 0
-        var selectedFontFamily: FontFamily = FontFamily(Font(R.font.open_dyslexic3_bold))
+        var wybranaRodzinaCzcionki: FontFamily = FontFamily(Font(R.font.open_dyslexic3_bold))
     }
-    fun saveLastViewedPage(context: Context, bookIdentifier: String, pageIndex: Int) {
+    fun saveOstatniaStrona(context: Context, bookIdentifier: String, pageIndex: Int) {
         val sharedPreferences = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
-        editor.putInt("lastViewedPage_$bookIdentifier", pageIndex)
+        editor.putInt("OstatniaStrona_$bookIdentifier", pageIndex)
         editor.apply()
     }
 
-    fun getLastViewedPage(context: Context, bookIdentifier: String): Int {
+    fun getOstatniaStrona(context: Context, bookIdentifier: String): Int {
         val sharedPreferences = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
-        return sharedPreferences.getInt("lastViewedPage_$bookIdentifier", 0) // 0 is the default value if the key is not found
+        return sharedPreferences.getInt("OstatniaStrona_$bookIdentifier", 0)
     }
 }
 
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "UnrememberedMutableState")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun BookDetailsScreen(
@@ -63,14 +62,15 @@ fun BookDetailsScreen(
     content: String,
     onNavigateBack: () -> Unit,
     navController: NavHostController,
-    viewModel: LastViewedPage.BookDetailsViewModel
+    viewModel: OstatniaStrona.BookDetailsViewModel
 ) {
-   // val viewModel: LastViewedPage.BookDetailsViewModel = viewModel()
+    val viewModel: OstatniaStrona.BookDetailsViewModel = viewModel()
     val context = LocalContext.current
+    var wybranyRozmiarCzcionki by mutableStateOf(20.sp)
 
     val pages = splitContentIntoPages(content)
     val bookIdentifier = title
-    val savedPageIndex = LastViewedPage.getLastViewedPage(context, bookIdentifier)
+    val savedPageIndex = OstatniaStrona.getOstatniaStrona(context, bookIdentifier)
 
     val pagerState = rememberPagerState(
         initialPage = savedPageIndex,
@@ -82,7 +82,7 @@ fun BookDetailsScreen(
     DisposableEffect(pagerState.currentPage) {
         onDispose {
             viewModel.currentPage = pagerState.currentPage
-            LastViewedPage.saveLastViewedPage(context, bookIdentifier, pagerState.currentPage)
+            OstatniaStrona.saveOstatniaStrona(context, bookIdentifier, pagerState.currentPage)
         }
     }
 
@@ -122,8 +122,8 @@ fun BookDetailsScreen(
                         Text(
                             text = pageContent,
                             style = TextStyle(
-                                fontFamily = viewModel.selectedFontFamily,
-                                fontSize = 20.sp,
+                                fontFamily = BookManager.wybranaRodzinaCzcionki ?: FontFamily.Default,
+                                fontSize = BookManager.wybranyRozmiarCzcionki,
                                 fontWeight = FontWeight.Normal
                             ),
                             modifier = Modifier.fillMaxWidth(),

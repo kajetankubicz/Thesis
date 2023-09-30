@@ -15,37 +15,23 @@ import org.jsoup.Jsoup
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.navigation.NavHostController
 
 object ReadEpubBook {
     fun readEpubFromAssets(assetManager: AssetManager, epubFileName: String?, onBookInfoReady: (String, String, String, Bitmap?) -> Unit) {
         try {
-            // Load the EPUB file from assets
             val epubInputStream = assetManager.open(epubFileName!!)
 
-            // Read the EPUB book using EpubReader
             val book = EpubReader().readEpub(epubInputStream)
 
-            // Get the book's title and author
             val title = book.title
             val author = book.metadata.authors.joinToString(", ")
             val content = StringBuilder()
             var coverImageBitmap: Bitmap? = null
 
-            // Book cover
             for (resource in book.resources.all) {
                 if (resource.mediaType?.toString()?.startsWith("image/") == true) {
                     val coverStream = resource.inputStream
@@ -55,23 +41,20 @@ object ReadEpubBook {
                 }
             }
 
-            // Get book content
             for (resource in book.contents) {
                 content.append(resource.reader.readText())
             }
 
-            // Close the input stream when done
             epubInputStream.close()
 
-            // Remove formatting tags
             val plainText = Jsoup.parse(content.toString()).text()
 
-            // Pass the book's title, author and content to the callback
             onBookInfoReady(title, author, plainText, coverImageBitmap)
         } catch (e: IOException) {
             e.printStackTrace()
         }
     }
+
 }
 
 @Composable

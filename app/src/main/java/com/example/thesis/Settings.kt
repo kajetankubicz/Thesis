@@ -10,11 +10,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.Switch
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -30,7 +27,7 @@ import java.io.IOException
 import java.io.InputStreamReader
 
 @Composable
-fun SettingsScreen(context: Context) {
+fun EkranInformacji(context: Context) {
     var selectedFileUri by remember { mutableStateOf<Uri?>(null) }
     var selectedBook: Book? by remember { mutableStateOf(null) }
     val openDocumentLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->

@@ -2,7 +2,9 @@ package com.example.thesis
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
+import android.util.Base64
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -25,47 +27,85 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType.Companion.LongPress
-import androidx.compose.ui.input.pointer.pointerInput
-
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.sp
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import java.io.ByteArrayOutputStream
 
 data class BookInfo(
     val title: String,
     val content: String,
     val coverImageBitmap: Bitmap?,
+    var isFavorite: Boolean = false
 )
 
 object BookManager {
-    val favoriteBooks = mutableStateListOf<BookInfo>()
-    fun saveFavorites(context: Context) {
-        val prefs = context.getSharedPreferences("Favorites", Context.MODE_PRIVATE)
-        val favoriteTitles = favoriteBooks.map { it.title }.toSet()
+    val dodaneKsiazki = mutableStateListOf<BookInfo>()
+    var wybranyRozmiarCzcionki by mutableStateOf(20.sp)
+    var wybranaRodzinaCzcionki by mutableStateOf<FontFamily?>(null)
+
+    fun toggleFavorite(bookInfo: BookInfo, context: Context) {
+        bookInfo.isFavorite = !bookInfo.isFavorite
+        saveAdded(context)
+    }
+    fun saveAdded(context: Context) {
+        val prefs = context.getSharedPreferences("Added", Context.MODE_PRIVATE)
+        val favoriteBooksJson = dodaneKsiazki.map { bookInfo ->
+            val bookData = mutableMapOf<String, Any>()
+            bookData["title"] = bookInfo.title
+            bookData["content"] = bookInfo.content
+            bookData["isFavorite"] = bookInfo.isFavorite
+            if (bookInfo.coverImageBitmap != null) {
+                val byteArrayOutputStream = ByteArrayOutputStream()
+                bookInfo.coverImageBitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
+                val encodedImage = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT)
+                bookData["coverImageBitmap"] = encodedImage
+            }
+            return@map bookData
+        }
+        val json = Gson().toJson(favoriteBooksJson)
         prefs.edit {
-            putStringSet("favoriteTitles", favoriteTitles)
+            putString("favoriteBooksJson", json)
         }
     }
-    fun loadFavorites(context: Context, allBooks: List<BookInfo>) {
-        val prefs = context.getSharedPreferences("Favorites", Context.MODE_PRIVATE)
-        val favoriteTitles = prefs.getStringSet("favoriteTitles", emptySet())
-        favoriteBooks.clear()
-        favoriteTitles?.forEach { title ->
-            val book = allBooks.find { it.title == title }
-            book?.let {
-                favoriteBooks.add(it)
+    fun loadAdded(context: Context, allBooks: List<BookInfo>) {
+        val prefs = context.getSharedPreferences("Added", Context.MODE_PRIVATE)
+        val json = prefs.getString("favoriteBooksJson", null)
+        dodaneKsiazki.clear()
+
+        if (!json.isNullOrEmpty()) {
+            val favoriteBooksJson = Gson().fromJson<List<Map<String, Any>>>(json, object : TypeToken<List<Map<String, Any>>>() {}.type)
+            favoriteBooksJson.forEach { bookData ->
+                val title = bookData["title"] as? String ?: ""
+                val content = bookData["content"] as? String ?: ""
+                val encodedImage = bookData["coverImageBitmap"] as? String
+                val coverImageBitmap = if (!encodedImage.isNullOrEmpty()) {
+                    val decodedBytes = Base64.decode(encodedImage, Base64.DEFAULT)
+                    BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
+                } else {
+                    null
+                }
+                val isFavorite = bookData["isFavorite"] as? Boolean ?: false
+                val bookInfo = allBooks.find { it.title == title && it.content == content }?.apply {
+                    this.isFavorite = isFavorite
+                } ?: BookInfo(title, content, coverImageBitmap, isFavorite)
+                dodaneKsiazki.add(bookInfo)
             }
         }
     }
+
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BookCoverItem(
     coverImageBitmap: Bitmap?,
-    isFavorite: Boolean,
+    bookInfo: BookInfo,
     onClick: () -> Unit,
-    onFavoriteClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
+    val context = LocalContext.current
     val isLongPressed = remember { mutableStateOf(false) }
 
     Card(
@@ -113,14 +153,14 @@ fun BookCoverItem(
                                 shape = CircleShape
                             )
                             .clickable {
-                                onFavoriteClick()
+                                BookManager.toggleFavorite(bookInfo, context)
                             },
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = if (isFavorite) Icons.Default.Star else Icons.Default.Star,
+                            imageVector = if (bookInfo.isFavorite) Icons.Default.Star else Icons.Default.Star,
                             contentDescription = "Favorite",
-                            tint = if (isFavorite) Color.Red.copy(0.75f) else Color.Gray.copy(0.9f),
+                            tint = if (bookInfo.isFavorite) Color.Red.copy(0.75f) else Color.Gray.copy(0.9f),
                             modifier = Modifier.size(35.dp)
                         )
                     }
@@ -134,6 +174,7 @@ fun BookCoverItem(
             title = { Text(text = "Usunąć książkę?") },
             text = {
                 Text(text = "Czy na pewno chcesz usunąć tę książkę?")
+
             },
             confirmButton = {
                 Button(
@@ -159,40 +200,18 @@ fun BookCoverItem(
 }
 
 @Composable
-fun HomeScreen(
+fun EkranKsiazek(
     navController: NavHostController,
-    favoriteBooks: MutableList<BookInfo>,
+    dodaneKsiazki: MutableList<BookInfo>,
 ) {
     val context = LocalContext.current
-    val assetManager = LocalContext.current.assets
 
     var books by remember { mutableStateOf(emptyList<BookInfo>()) }
 
-    val (favoriteBooksList, nonFavoriteBooksList) = books.partition {
-        BookManager.favoriteBooks.contains(it)
-    }
-
-    val sortedBooks = favoriteBooksList + nonFavoriteBooksList
-
-    LaunchedEffect(Unit, favoriteBooks) {
-        val bookList = mutableListOf<BookInfo>()
-        bookList.addAll(BookManager.favoriteBooks)
-        bookList.addAll(favoriteBooks)
-
-        val assetFiles = assetManager.list("") ?: emptyArray()
-        val epubFiles = assetFiles.filter { it.endsWith(".epub") }
-
-        epubFiles.forEach { epubFileName ->
-            ReadEpubBook.readEpubFromAssets(assetManager, epubFileName) { title, _, plainText, coverImageBitmap ->
-                bookList.add(BookInfo(title, plainText, coverImageBitmap))
-            }
-        }
-
-        books = bookList
-
-        BookManager.loadFavorites(context, bookList)
-    }
-
+    val bookList = mutableListOf<BookInfo>()
+    bookList.addAll(BookManager.dodaneKsiazki)
+    BookManager.loadAdded(context, bookList)
+    books = bookList
 
     Box(
         modifier = Modifier
@@ -205,10 +224,10 @@ fun HomeScreen(
                 .background(color = MaterialTheme.colorScheme.surface),
             columns = GridCells.Fixed(2),
             content = {
-                items(sortedBooks) { book ->
+                items(books) { book ->
                     BookCoverItem(
                         coverImageBitmap = book.coverImageBitmap,
-                        isFavorite = BookManager.favoriteBooks.contains(book),
+                        bookInfo = book,
                         onClick = {
                             navController.navigate(
                                 "BookDetailsScreen/${book.title}/${
@@ -220,18 +239,10 @@ fun HomeScreen(
                                 launchSingleTop = true
                             }
                         },
-                        onFavoriteClick = {
-                            if (BookManager.favoriteBooks.contains(book)) {
-                                BookManager.favoriteBooks.remove(book)
-                            } else {
-                                BookManager.favoriteBooks.add(book)
-                            }
-                            BookManager.saveFavorites(context)
-                        },
                         onDeleteClick = {
                             books = books.filterNot { it == book }
-                            BookManager.favoriteBooks.remove(book)
-                            BookManager.saveFavorites(context)
+                            BookManager.dodaneKsiazki.remove(book)
+                            BookManager.saveAdded(context)
                         }
                     )
 
@@ -240,15 +251,12 @@ fun HomeScreen(
         )
 
         val selectedEpubFile = remember { mutableStateOf<Uri?>(null) }
-
         val updatedSelectedEpubFile = rememberUpdatedState(selectedEpubFile.value)
-
         val filePickerLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.GetContent()
         ) { uri: Uri? ->
             selectedEpubFile.value = uri
         }
-
 
         FloatingActionButton(
             modifier = Modifier
@@ -257,12 +265,11 @@ fun HomeScreen(
                 .padding(16.dp),
             onClick = {
                 filePickerLauncher.launch("application/epub+zip")
-
             },
             containerColor = MaterialTheme.colorScheme.onSurface,
             contentColor = MaterialTheme.colorScheme.surface
         ) {
-            Icon(Icons.Filled.Add, "Add book")
+            Icon(Icons.Filled.Add, "Dodaj ksiazke")
 
         }
 
@@ -274,6 +281,8 @@ fun HomeScreen(
                     if (inputStream != null) {
                         val newBook = readEpubFromInputStream(inputStream)
                         books = books + newBook
+                        BookManager.dodaneKsiazki.add(newBook)
+                        BookManager.saveAdded(context)
                         selectedEpubFile.value = null
                     }
                 }
@@ -281,4 +290,5 @@ fun HomeScreen(
         }
     }
 }
+
 

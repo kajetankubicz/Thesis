@@ -2,24 +2,22 @@ package com.example.thesis
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.ui.graphics.vector.ImageVector
 
-sealed class Navigation(
-    val route: String,
-    val title: String,
-    val icon: ImageVector
+sealed class Nawigacja(
+    val trasa: String,
+    val tytul: String,
+    val ikona: ImageVector
 ){
-    object Home: Navigation(
-        route = "home",
-        title = "Home",
-        icon = Icons.Default.Home
+    object Ksiazki: Nawigacja(
+        trasa = "ksiazki",
+        tytul = "Książki",
+        ikona = Icons.Default.Home
     )
-    object Settings: Navigation(
-        route = "settings",
-        title = "Settings",
-        icon = Icons.Default.Settings
+    object Informacje: Nawigacja(
+        trasa = "informacje",
+        tytul = "Informacje",
+        ikona = Icons.Default.Info
     )
-
 }

@@ -1,38 +1,26 @@
 package com.example.thesis
 
-import android.content.Context
-import android.support.v4.os.IResultReceiver2.Default
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import androidx.compose.ui.text.font.Typeface
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TxtConfigure(
     onNavigateBack: () -> Unit,
-    viewModel: LastViewedPage.BookDetailsViewModel
+    viewModel: OstatniaStrona.BookDetailsViewModel
 ) {
-    var isExpanded by remember {
-        mutableStateOf(false)
-    }
+    var isFontExpanded by remember { mutableStateOf(false) }
+    var isSizeExpanded by remember { mutableStateOf(false) }
 
     val fontFamilies = mapOf(
         "Arial_th" to FontFamily(Font(R.font.arial_th)),
@@ -42,9 +30,7 @@ fun TxtConfigure(
         "Courier" to FontFamily(Font(R.font.courier)),
     )
 
-    val selectedFontText = remember {
-        mutableStateOf("Arial_th")
-    }
+    val selectedFontText = remember { mutableStateOf("Arial_th") }
 
     Column {
         TopAppBar(
@@ -71,7 +57,7 @@ fun TxtConfigure(
             readOnly = true,
             trailingIcon = {
                 IconButton(
-                    onClick = { isExpanded = !isExpanded },
+                    onClick = { isFontExpanded = !isFontExpanded },
                 ) {
                     Icon(
                         Icons.Default.KeyboardArrowDown,
@@ -86,7 +72,7 @@ fun TxtConfigure(
                 .padding(16.dp)
         )
 
-        if (isExpanded) {
+        if (isFontExpanded) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -99,9 +85,58 @@ fun TxtConfigure(
                                 Text(text = fontName)
                             },
                             onClick = {
-                                viewModel.selectedFontFamily = fontFamily
+                                BookManager.wybranaRodzinaCzcionki = fontFamily
                                 selectedFontText.value = fontName
-                                isExpanded = false
+                                isFontExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
+        }
+
+        OutlinedTextField(
+            value = BookManager.wybranyRozmiarCzcionki.toString(),
+            onValueChange = {
+                val newSize = it.toIntOrNull()
+                if (newSize != null) {
+                    BookManager.wybranyRozmiarCzcionki = newSize.sp
+                }
+            },
+            readOnly = true,
+            trailingIcon = {
+                IconButton(
+                    onClick = { isSizeExpanded = !isSizeExpanded },
+                ) {
+                    Icon(
+                        Icons.Default.KeyboardArrowDown,
+                        contentDescription = "Toggle Dropdown",
+                    )
+                }
+            },
+            label = { Text(text = "Rozmiar czcionki") },
+            colors = TextFieldDefaults.textFieldColors(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        )
+
+        if (isSizeExpanded) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+            ) {
+                Column {
+                    val fontSizes = listOf(14, 16, 18, 20, 22, 24, 26)
+                    fontSizes.forEach { fontSize ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(text = fontSize.toString())
+                            },
+                            onClick = {
+                                BookManager.wybranyRozmiarCzcionki = fontSize.sp
+                                isSizeExpanded = false
                             }
                         )
                     }
@@ -110,6 +145,8 @@ fun TxtConfigure(
         }
     }
 }
+
+
 
 
 
