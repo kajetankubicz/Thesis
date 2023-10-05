@@ -27,8 +27,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.sp
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.io.ByteArrayOutputStream
@@ -206,50 +212,93 @@ fun EkranKsiazek(
 ) {
     val context = LocalContext.current
 
+    val kot by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.lottie_cat))
+    val kotProgres by animateLottieCompositionAsState(composition = kot, iterations = LottieConstants.IterateForever)
+
     var books by remember { mutableStateOf(emptyList<BookInfo>()) }
 
     val bookList = mutableListOf<BookInfo>()
     bookList.addAll(BookManager.dodaneKsiazki)
     BookManager.loadAdded(context, bookList)
     books = bookList
+    books = bookList.sortedByDescending { it.isFavorite }
+
+    val jezeliListaKsiazekJestPusta = books.isEmpty()
 
     Box(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        LazyVerticalGrid(
-            modifier = Modifier
-                .padding(bottom = 80.dp)
-                .fillMaxSize()
-                .background(color = MaterialTheme.colorScheme.surface),
-            columns = GridCells.Fixed(2),
-            content = {
-                items(books) { book ->
-                    BookCoverItem(
-                        coverImageBitmap = book.coverImageBitmap,
-                        bookInfo = book,
-                        onClick = {
-                            navController.navigate(
-                                "BookDetailsScreen/${book.title}/${
-                                    Uri.encode(
-                                        book.content
-                                    )
-                                }"
-                            ) {
-                                launchSingleTop = true
-                            }
-                        },
-                        onDeleteClick = {
-                            books = books.filterNot { it == book }
-                            BookManager.dodaneKsiazki.remove(book)
-                            BookManager.saveAdded(context)
-                        }
+        if (jezeliListaKsiazekJestPusta) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Nie widzę żadnych książek...",
+                    fontSize = 24.sp,
+                    fontFamily = FontFamily.SansSerif,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.padding(start = 30.dp, end = 30.dp)
+                ) {
+                    LottieAnimation(
+                        composition = kot,
+                        progress = {kotProgres},
+                        modifier = Modifier.size(400.dp)
                     )
-
                 }
+                Text(
+                    text = "Dodaj jakąś klikając na znak \"+\"",
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily.SansSerif,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
             }
-        )
+        } else {
+            LazyVerticalGrid(
+                modifier = Modifier
+                    .padding(bottom = 80.dp)
+                    .fillMaxSize()
+                    .background(
+                        color =
+                        if (jezeliListaKsiazekJestPusta) {
+                            MaterialTheme.colorScheme.surface
+                        } else {
+                            MaterialTheme.colorScheme.surface
+                        }
+                    ),
+                columns = GridCells.Fixed(2),
+                content = {
+                    items(books) { book ->
+                        BookCoverItem(
+                            coverImageBitmap = book.coverImageBitmap,
+                            bookInfo = book,
+                            onClick = {
+                                navController.navigate(
+                                    "BookDetailsScreen/${book.title}/${
+                                        Uri.encode(
+                                            book.content
+                                        )
+                                    }"
+                                ) {
+                                    launchSingleTop = true
+                                }
+                            },
+                            onDeleteClick = {
+                                books = books.filterNot { it == book }
+                                BookManager.dodaneKsiazki.remove(book)
+                                BookManager.saveAdded(context)
+                            }
+                        )
 
+                    }
+                }
+            )
+        }
         val selectedEpubFile = remember { mutableStateOf<Uri?>(null) }
         val updatedSelectedEpubFile = rememberUpdatedState(selectedEpubFile.value)
         val filePickerLauncher = rememberLauncherForActivityResult(
