@@ -9,8 +9,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -23,6 +27,8 @@ fun TxtConfigure(
     var isFontExpanded by remember { mutableStateOf(false) }
     var isSizeExpanded by remember { mutableStateOf(false) }
     var letterSpacingEnabled by remember { mutableStateOf(false) }
+    var highlightSimilarLetters by remember { mutableStateOf(false) }
+    var isBackgroundColorExpanded by remember { mutableStateOf(false) }
 
     val fontFamilies = mapOf(
         "Arial_th" to FontFamily(Font(R.font.arial_th)),
@@ -33,6 +39,7 @@ fun TxtConfigure(
     )
 
     val selectedFontText = remember { mutableStateOf("Arial_th") }
+    var selectedBackgroundColor = remember { mutableStateOf("d5a6bd") }
 
     Column {
         TopAppBar(
@@ -90,6 +97,55 @@ fun TxtConfigure(
                                 BookManager.wybranaRodzinaCzcionki = fontFamily
                                 selectedFontText.value = fontName
                                 isFontExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
+        }
+
+        OutlinedTextField(
+            value = selectedBackgroundColor.value,
+            onValueChange = {},
+            readOnly = true,
+            trailingIcon = {
+                IconButton(
+                    onClick = { isBackgroundColorExpanded = !isBackgroundColorExpanded },
+                ) {
+                    Icon(
+                        Icons.Default.KeyboardArrowDown,
+                        contentDescription = "Toggle Background Color Dropdown",
+                    )
+                }
+            },
+            label = { Text(text = "Kolor tła ") },
+            colors = TextFieldDefaults.textFieldColors(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        )
+
+        if (isBackgroundColorExpanded) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+            ) {
+                Column {
+                    val backgroundColors = listOf(
+                        "0xf44336" to Color(0xf44336),
+                        "0xf1c232" to Color(0xf1c232),
+                        "0x6aa84f" to Color(0x6aa84f),
+                        "0xd5a6bd" to Color(0xd5a6bd)
+                    )
+                    backgroundColors.forEach { (color) ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(text = color)
+                            },
+                            onClick = {
+                                selectedBackgroundColor.value = color
+                                isBackgroundColorExpanded = false
                             }
                         )
                     }
@@ -159,7 +215,42 @@ fun TxtConfigure(
                 }
             )
         }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = "Wyróżnij podobne litery", modifier = Modifier.weight(1f))
+            Switch(
+                checked = BookManager.highlightSimilarLetters,
+                onCheckedChange = { newCheckedValue ->
+                    BookManager.highlightSimilarLetters = newCheckedValue
+                }
+            )
+        }
     }
+}
+
+@Composable
+fun HighlightSimilarLettersText(
+    text: String,
+    highlightSimilarLetters: Set<Char>
+) {
+    val similarLetters = setOf('p', 'b', 'g', 'd', 'w', 'v')
+    val textWithSpannable = buildAnnotatedString {
+        text.forEach { char ->
+            val textColor = if (similarLetters.contains(char) && char in highlightSimilarLetters) {
+                Color.Red
+            } else {
+                Color.Black
+            }
+            withStyle(style = SpanStyle(color = textColor)) {
+                append(char.toString())
+            }
+        }
+    }
+    Text(textWithSpannable)
 }
 
 

@@ -3,6 +3,7 @@ package com.example.thesis
 import android.annotation.SuppressLint
 import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,6 +25,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -64,7 +66,8 @@ fun BookDetailsScreen(
     onNavigateBack: () -> Unit,
     navController: NavHostController,
     viewModel: OstatniaStrona.BookDetailsViewModel,
-    letterSpacingEnabled: Boolean
+    letterSpacingEnabled: Boolean,
+    highlightSimilarLetters: Boolean
 ) {
     val viewModel: OstatniaStrona.BookDetailsViewModel = viewModel()
     val context = LocalContext.current
@@ -94,44 +97,63 @@ fun BookDetailsScreen(
                 colors = TopAppBarDefaults.smallTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(6.dp)
                 ),
-                title =  {
+                title = {
                     Text(text = title, color = MaterialTheme.colorScheme.onSurface)
                 },
                 navigationIcon = {
-                    IconButton(onClick = {onNavigateBack()}) {
-                        Icon(Icons.Filled.ArrowBack, tint = MaterialTheme.colorScheme.onSurface, contentDescription = "Arrow back")
+                    IconButton(onClick = { onNavigateBack() }) {
+                        Icon(
+                            Icons.Filled.ArrowBack,
+                            tint = MaterialTheme.colorScheme.onSurface,
+                            contentDescription = "Arrow back"
+                        )
                     }
                 },
                 actions = {
-                    IconButton(onClick = {navController.navigate("BooksScreen")}) {
-                        Icon(Icons.Filled.MoreVert, tint = MaterialTheme.colorScheme.onSurface, contentDescription = "More vert")
+                    IconButton(onClick = { navController.navigate("BooksScreen") }) {
+                        Icon(
+                            Icons.Filled.MoreVert,
+                            tint = MaterialTheme.colorScheme.onSurface,
+                            contentDescription = "More vert"
+                        )
                     }
                 }
             )
         },
         content = {
             HorizontalPager(
-                state  = pagerState,
+                state = pagerState,
                 modifier = Modifier.fillMaxSize(),
             ) { page ->
                 val pageContent = pages[page]
 
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize().padding(top = it.calculateTopPadding()),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = it.calculateTopPadding())
+                        .background(Color.White),
                     contentPadding = PaddingValues(16.dp)
                 ) {
                     item {
                         val letterSpacing = if (BookManager.letterSpacingEnabled) 0.2.em else 0.em
-                        Text(
-                            text = pageContent,
-                            style = TextStyle(
-                                fontFamily = BookManager.wybranaRodzinaCzcionki ?: FontFamily.Default,
-                                fontSize = BookManager.wybranyRozmiarCzcionki,
-                                fontWeight = FontWeight.Normal,
-                                letterSpacing = letterSpacing
-                            ),
-                            modifier = Modifier.fillMaxWidth(),
-                        )
+                        val textWithHighlights = if (highlightSimilarLetters) {
+                            HighlightSimilarLettersText(
+                                pageContent,
+                                setOf('p', 'b', 'g', 'd', 'w', 'v')
+                            )
+                        } else {
+                            Text(
+                                text = pageContent,
+                                style = TextStyle(
+                                    fontFamily = BookManager.wybranaRodzinaCzcionki
+                                        ?: FontFamily.Default,
+                                    fontSize = BookManager.wybranyRozmiarCzcionki,
+                                    fontWeight = FontWeight.Normal,
+                                    letterSpacing = letterSpacing,
+                                ),
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                        }
                     }
                 }
             }

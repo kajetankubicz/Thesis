@@ -7,6 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.thesis.BookManager.highlightSimilarLetters
 
 @Composable
 fun NavigationGraph(navController: NavHostController, context: Context, dodaneKsiazki: MutableList<BookInfo>, viewModel: OstatniaStrona.BookDetailsViewModel){
@@ -28,7 +29,7 @@ fun NavigationGraph(navController: NavHostController, context: Context, dodaneKs
             val tytul = backStackEntry.arguments?.getString("title") ?: ""
             val tesc = Uri.decode(backStackEntry.arguments?.getString("content") ?: "")
             val letterSpacingEnabled = backStackEntry.arguments?.getString("letterSpacingEnabled")?.toBoolean() ?: false
-            BookDetailsScreen(tytul, tesc, { navController.popBackStack() }, navController, viewModel, letterSpacingEnabled)
+            BookDetailsScreen(tytul, tesc, { navController.popBackStack() }, navController, viewModel, letterSpacingEnabled, highlightSimilarLetters)
         }
         composable(route = "BooksScreen") {
             TxtConfigure(
