@@ -19,7 +19,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    EkranGlowny(viewModel = OstatniaStrona.BookDetailsViewModel())
+                    MainScreen(viewModel = LastViewedPage.BookDetailsViewModel())
                 }
             }
         }

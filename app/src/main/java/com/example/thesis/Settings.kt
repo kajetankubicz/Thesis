@@ -27,7 +27,7 @@ import java.io.IOException
 import java.io.InputStreamReader
 
 @Composable
-fun EkranInformacji(context: Context) {
+fun InfoScreen(context: Context) {
     var selectedFileUri by remember { mutableStateOf<Uri?>(null) }
     var selectedBook: Book? by remember { mutableStateOf(null) }
     val openDocumentLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->

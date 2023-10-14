@@ -5,19 +5,19 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.ui.graphics.vector.ImageVector
 
-sealed class Nawigacja(
-    val trasa: String,
-    val tytul: String,
-    val ikona: ImageVector
+sealed class Navigation(
+    val path: String,
+    val title: String,
+    val icon: ImageVector
 ){
-    object Ksiazki: Nawigacja(
-        trasa = "ksiazki",
-        tytul = "Książki",
-        ikona = Icons.Default.Home
+    object Books: Navigation(
+        path = "books",
+        title = "Books",
+        icon = Icons.Default.Home
     )
-    object Informacje: Nawigacja(
-        trasa = "informacje",
-        tytul = "Informacje",
-        ikona = Icons.Default.Info
+    object Informations: Navigation(
+        path = "informations",
+        title = "Informations",
+        icon = Icons.Default.Info
     )
 }

@@ -7,7 +7,8 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Yellow
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -17,20 +18,21 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun TxtConfigure(
     onNavigateBack: () -> Unit,
-    viewModel: OstatniaStrona.BookDetailsViewModel
+    viewModel: LastViewedPage.BookDetailsViewModel,
 ) {
     var isFontExpanded by remember { mutableStateOf(false) }
     var isSizeExpanded by remember { mutableStateOf(false) }
 
+
     val fontFamilies = mapOf(
-        "Arial_th" to FontFamily(Font(R.font.arial_th)),
-        "Open_dyslexic3_bold" to FontFamily(Font(R.font.open_dyslexic3_bold)),
+        "Arial" to FontFamily(Font(R.font.arial_th)),
+        "Open dyslexic" to FontFamily(Font(R.font.open_dyslexic3_bold)),
         "Helvetica" to FontFamily(Font(R.font.helvetica)),
         "Verdana" to FontFamily(Font(R.font.verdana)),
         "Courier" to FontFamily(Font(R.font.courier)),
     )
 
-    val selectedFontText = remember { mutableStateOf("Arial_th") }
+    val selectedFontText = remember { mutableStateOf("Arial") }
 
     Column {
         TopAppBar(
@@ -50,6 +52,7 @@ fun TxtConfigure(
                 }
             },
         )
+
 
         OutlinedTextField(
             value = selectedFontText.value,
@@ -85,7 +88,7 @@ fun TxtConfigure(
                                 Text(text = fontName)
                             },
                             onClick = {
-                                BookManager.wybranaRodzinaCzcionki = fontFamily
+                                BookManager.chooseFontFamily = fontFamily
                                 selectedFontText.value = fontName
                                 isFontExpanded = false
                             }
@@ -96,11 +99,11 @@ fun TxtConfigure(
         }
 
         OutlinedTextField(
-            value = BookManager.wybranyRozmiarCzcionki.toString(),
+            value = BookManager.chooseFontSize.toString().replace(".0", "").replace(".sp", ""),
             onValueChange = {
                 val newSize = it.toIntOrNull()
                 if (newSize != null) {
-                    BookManager.wybranyRozmiarCzcionki = newSize.sp
+                    BookManager.chooseFontSize = newSize.sp
                 }
             },
             readOnly = true,
@@ -135,7 +138,7 @@ fun TxtConfigure(
                                 Text(text = fontSize.toString())
                             },
                             onClick = {
-                                BookManager.wybranyRozmiarCzcionki = fontSize.sp
+                                BookManager.chooseFontSize = fontSize.sp
                                 isSizeExpanded = false
                             }
                         )
@@ -143,6 +146,7 @@ fun TxtConfigure(
                 }
             }
         }
+
     }
 }
 

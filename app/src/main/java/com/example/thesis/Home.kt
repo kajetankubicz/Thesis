@@ -47,9 +47,10 @@ data class BookInfo(
 )
 
 object BookManager {
-    val dodaneKsiazki = mutableStateListOf<BookInfo>()
-    var wybranyRozmiarCzcionki by mutableStateOf(20.sp)
-    var wybranaRodzinaCzcionki by mutableStateOf<FontFamily?>(null)
+    val addedBooks = mutableStateListOf<BookInfo>()
+    var chooseFontSize by mutableStateOf(20.sp)
+    var chooseFontFamily by mutableStateOf<FontFamily?>(null)
+    var chooseBgColor by mutableStateOf("MaterialTheme.colorScheme.onSurface")
 
     fun toggleFavorite(bookInfo: BookInfo, context: Context) {
         bookInfo.isFavorite = !bookInfo.isFavorite
@@ -57,7 +58,7 @@ object BookManager {
     }
     fun saveAdded(context: Context) {
         val prefs = context.getSharedPreferences("Added", Context.MODE_PRIVATE)
-        val favoriteBooksJson = dodaneKsiazki.map { bookInfo ->
+        val favoriteBooksJson = addedBooks.map { bookInfo ->
             val bookData = mutableMapOf<String, Any>()
             bookData["title"] = bookInfo.title
             bookData["content"] = bookInfo.content
@@ -78,7 +79,7 @@ object BookManager {
     fun loadAdded(context: Context, allBooks: List<BookInfo>) {
         val prefs = context.getSharedPreferences("Added", Context.MODE_PRIVATE)
         val json = prefs.getString("favoriteBooksJson", null)
-        dodaneKsiazki.clear()
+        addedBooks.clear()
 
         if (!json.isNullOrEmpty()) {
             val favoriteBooksJson = Gson().fromJson<List<Map<String, Any>>>(json, object : TypeToken<List<Map<String, Any>>>() {}.type)
@@ -96,7 +97,7 @@ object BookManager {
                 val bookInfo = allBooks.find { it.title == title && it.content == content }?.apply {
                     this.isFavorite = isFavorite
                 } ?: BookInfo(title, content, coverImageBitmap, isFavorite)
-                dodaneKsiazki.add(bookInfo)
+                addedBooks.add(bookInfo)
             }
         }
     }
@@ -206,30 +207,30 @@ fun BookCoverItem(
 }
 
 @Composable
-fun EkranKsiazek(
+fun BookScreen(
     navController: NavHostController,
-    dodaneKsiazki: MutableList<BookInfo>,
+    addedBooks: MutableList<BookInfo>,
 ) {
     val context = LocalContext.current
 
-    val kot by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.lottie_cat))
-    val kotProgres by animateLottieCompositionAsState(composition = kot, iterations = LottieConstants.IterateForever)
+    val cat by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.lottie_cat))
+    val catProgress by animateLottieCompositionAsState(composition = cat, iterations = LottieConstants.IterateForever)
 
     var books by remember { mutableStateOf(emptyList<BookInfo>()) }
 
     val bookList = mutableListOf<BookInfo>()
-    bookList.addAll(BookManager.dodaneKsiazki)
+    bookList.addAll(BookManager.addedBooks)
     BookManager.loadAdded(context, bookList)
     books = bookList
     books = bookList.sortedByDescending { it.isFavorite }
 
-    val jezeliListaKsiazekJestPusta = books.isEmpty()
+    val ifBooksListIsEmpty = books.isEmpty()
 
     Box(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        if (jezeliListaKsiazekJestPusta) {
+        if (ifBooksListIsEmpty) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
@@ -246,8 +247,8 @@ fun EkranKsiazek(
                     modifier = Modifier.padding(start = 30.dp, end = 30.dp)
                 ) {
                     LottieAnimation(
-                        composition = kot,
-                        progress = {kotProgres},
+                        composition = cat,
+                        progress = {catProgress},
                         modifier = Modifier.size(400.dp)
                     )
                 }
@@ -263,14 +264,7 @@ fun EkranKsiazek(
                 modifier = Modifier
                     .padding(bottom = 80.dp)
                     .fillMaxSize()
-                    .background(
-                        color =
-                        if (jezeliListaKsiazekJestPusta) {
-                            MaterialTheme.colorScheme.surface
-                        } else {
-                            MaterialTheme.colorScheme.surface
-                        }
-                    ),
+                    .background(color = MaterialTheme.colorScheme.surface),
                 columns = GridCells.Fixed(2),
                 content = {
                     items(books) { book ->
@@ -290,7 +284,7 @@ fun EkranKsiazek(
                             },
                             onDeleteClick = {
                                 books = books.filterNot { it == book }
-                                BookManager.dodaneKsiazki.remove(book)
+                                BookManager.addedBooks.remove(book)
                                 BookManager.saveAdded(context)
                             }
                         )
@@ -330,7 +324,7 @@ fun EkranKsiazek(
                     if (inputStream != null) {
                         val newBook = readEpubFromInputStream(inputStream)
                         books = books + newBook
-                        BookManager.dodaneKsiazki.add(newBook)
+                        BookManager.addedBooks.add(newBook)
                         BookManager.saveAdded(context)
                         selectedEpubFile.value = null
                     }
