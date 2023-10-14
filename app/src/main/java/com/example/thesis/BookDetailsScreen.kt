@@ -30,6 +30,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -62,7 +63,8 @@ fun BookDetailsScreen(
     content: String,
     onNavigateBack: () -> Unit,
     navController: NavHostController,
-    viewModel: OstatniaStrona.BookDetailsViewModel
+    viewModel: OstatniaStrona.BookDetailsViewModel,
+    letterSpacingEnabled: Boolean
 ) {
     val viewModel: OstatniaStrona.BookDetailsViewModel = viewModel()
     val context = LocalContext.current
@@ -119,12 +121,14 @@ fun BookDetailsScreen(
                     contentPadding = PaddingValues(16.dp)
                 ) {
                     item {
+                        val letterSpacing = if (BookManager.letterSpacingEnabled) 0.2.em else 0.em
                         Text(
                             text = pageContent,
                             style = TextStyle(
                                 fontFamily = BookManager.wybranaRodzinaCzcionki ?: FontFamily.Default,
                                 fontSize = BookManager.wybranyRozmiarCzcionki,
-                                fontWeight = FontWeight.Normal
+                                fontWeight = FontWeight.Normal,
+                                letterSpacing = letterSpacing
                             ),
                             modifier = Modifier.fillMaxWidth(),
                         )

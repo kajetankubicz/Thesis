@@ -50,6 +50,7 @@ object BookManager {
     val dodaneKsiazki = mutableStateListOf<BookInfo>()
     var wybranyRozmiarCzcionki by mutableStateOf(20.sp)
     var wybranaRodzinaCzcionki by mutableStateOf<FontFamily?>(null)
+    var letterSpacingEnabled by mutableStateOf(false)
 
     fun toggleFavorite(bookInfo: BookInfo, context: Context) {
         bookInfo.isFavorite = !bookInfo.isFavorite
@@ -100,7 +101,6 @@ object BookManager {
             }
         }
     }
-
 }
 
 @OptIn(ExperimentalFoundationApi::class)

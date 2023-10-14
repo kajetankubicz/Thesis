@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
@@ -21,6 +22,7 @@ fun TxtConfigure(
 ) {
     var isFontExpanded by remember { mutableStateOf(false) }
     var isSizeExpanded by remember { mutableStateOf(false) }
+    var letterSpacingEnabled by remember { mutableStateOf(false) }
 
     val fontFamilies = mapOf(
         "Arial_th" to FontFamily(Font(R.font.arial_th)),
@@ -142,6 +144,20 @@ fun TxtConfigure(
                     }
                 }
             }
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = "Przerwy między literami", modifier = Modifier.weight(1f))
+            Switch(
+                checked = BookManager.letterSpacingEnabled,
+                onCheckedChange = { newCheckedValue ->
+                    BookManager.letterSpacingEnabled = newCheckedValue
+                }
+            )
         }
     }
 }

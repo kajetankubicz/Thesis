@@ -27,7 +27,8 @@ fun NavigationGraph(navController: NavHostController, context: Context, dodaneKs
             route = "BookDetailsScreen/{title}/{content}") { backStackEntry ->
             val tytul = backStackEntry.arguments?.getString("title") ?: ""
             val tesc = Uri.decode(backStackEntry.arguments?.getString("content") ?: "")
-            BookDetailsScreen(tytul, tesc, { navController.popBackStack() }, navController, viewModel)
+            val letterSpacingEnabled = backStackEntry.arguments?.getString("letterSpacingEnabled")?.toBoolean() ?: false
+            BookDetailsScreen(tytul, tesc, { navController.popBackStack() }, navController, viewModel, letterSpacingEnabled)
         }
         composable(route = "BooksScreen") {
             TxtConfigure(
