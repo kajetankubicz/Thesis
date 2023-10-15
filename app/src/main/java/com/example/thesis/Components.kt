@@ -3,11 +3,15 @@ package com.example.thesis
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -68,11 +72,12 @@ fun CustomText(
             ),
             modifier = modifier,
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.None),
-            keyboardActions = KeyboardActions(onDone = {
-                onImeAction()
+            keyboardActions = KeyboardActions(onAny = {
                 keyboardController?.hide()
             }),
             readOnly = true,
+            enabled = false
         )
     }
 }
+

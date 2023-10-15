@@ -1,6 +1,8 @@
 package com.example.thesis
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -9,12 +11,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -69,10 +76,17 @@ fun TxtConfigure(
             },
         )
 
+        var isFontFocused by remember { mutableStateOf(false) }
+        val focusRequester = FocusRequester()
+
         OutlinedTextField(
             value = selectedFontText.value,
             onValueChange = {},
             readOnly = true,
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.None),
+            keyboardActions = KeyboardActions(onAny = {
+                keyboardController?.hide()
+            }),
             trailingIcon = {
                 IconButton(
                     onClick = { isFontExpanded = !isFontExpanded },
@@ -87,7 +101,14 @@ fun TxtConfigure(
             colors = TextFieldDefaults.textFieldColors(),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(16.dp)
+                .focusRequester(focusRequester)
+                .onFocusChanged {
+                    isFontFocused = it.isFocused
+                    if (it.isFocused) {
+                        keyboardController?.hide()
+                    }
+                },
         )
 
         if (isFontExpanded) {
@@ -113,10 +134,16 @@ fun TxtConfigure(
             }
         }
 
+        var isBgFocused by remember { mutableStateOf(false) }
+
         OutlinedTextField(
             value = selectedBackgroundColor.value,
             onValueChange = {},
             readOnly = true,
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.None),
+            keyboardActions = KeyboardActions(onAny = {
+                keyboardController?.hide()
+            }),
             trailingIcon = {
                 IconButton(
                     onClick = { isBackgroundColorExpanded = !isBackgroundColorExpanded },
@@ -132,6 +159,13 @@ fun TxtConfigure(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
+                .focusRequester(focusRequester)
+                .onFocusChanged {
+                    isBgFocused = it.isFocused
+                    if (it.isFocused) {
+                        keyboardController?.hide()
+                    }
+                },
         )
 
         if (isBackgroundColorExpanded) {
@@ -157,34 +191,8 @@ fun TxtConfigure(
             }
         }
 
-        /*
 
-        if (isBackgroundColorExpanded) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-            ) {
-                *//*Column {
-                    val backgroundColors = listOf(
-                        "0xf44336" to Color(0xf44336),
-                        "0xf1c232" to Color(0xf1c232),
-                        "0x6aa84f" to Color(0x6aa84f),
-                        "0xd5a6bd" to Color(0xd5a6bd)
-                    )
-                    backgroundColors.forEach { (color) ->
-                        DropdownMenuItem(
-                            text = {
-                                Text(text = color)
-                            },
-                            onClick = {
-                                selectedBackgroundColor.value = color
-                                isBackgroundColorExpanded = false
-                            }
-                        )
-                    }
-                }
-            }*/
+        var isFontSizeFocused by remember { mutableStateOf(false) }
 
             OutlinedTextField(
                 value = BookManager.chooseFontSize.toString().replace(".0", "").replace(".sp", ""),
@@ -195,6 +203,10 @@ fun TxtConfigure(
                     }
                 },
                 readOnly = true,
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.None),
+                keyboardActions = KeyboardActions(onAny = {
+                    keyboardController?.hide()
+                }),
                 trailingIcon = {
                     IconButton(
                         onClick = { isSizeExpanded = !isSizeExpanded },
@@ -210,6 +222,13 @@ fun TxtConfigure(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
+                    .focusRequester(focusRequester)
+                    .onFocusChanged {
+                        isFontSizeFocused = it.isFocused
+                        if (it.isFocused) {
+                            keyboardController?.hide()
+                        }
+                    },
             )
 
             if (isSizeExpanded) {

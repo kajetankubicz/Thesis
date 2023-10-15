@@ -155,7 +155,7 @@ fun BookDetailsScreen(
                             textColor = MaterialTheme.colorScheme.onSurface,
                             highlightLetters = highlightSimilarLetters,
                             modifier = Modifier.fillMaxWidth(1f),
-                            keyboard = KeyboardOptions.Default.copy(imeAction = ImeAction.None)
+                            keyboard = KeyboardOptions.Default.copy(imeAction = ImeAction.None),
                         )
                     }
                 }
