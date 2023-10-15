@@ -2,6 +2,8 @@ package com.example.thesis
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.DisplayMetrics
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
@@ -27,11 +29,13 @@ import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
@@ -70,11 +74,16 @@ fun BookDetailsScreen(
     highlightSimilarLetters: Boolean,
     bgColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.surface,
 ) {
+    val configuration = LocalConfiguration.current
+
+    val screenHeight = configuration.screenHeightDp.dp
+    val screenWidth = configuration.screenWidthDp.dp
+
     val viewModel: LastViewedPage.BookDetailsViewModel = viewModel()
     val context = LocalContext.current
-    var chooseFontSize  by mutableStateOf(20.sp)
+    var chooseFontSize  by mutableStateOf(BookManager.chooseFontSize)
 
-    val pages = splitContentIntoPages(content)
+    val pages = splitContentIntoPages(content, chooseFontSize.value.toInt(), screenHeight, screenWidth)
     val savedPageIndex = LastViewedPage.getLastPage(context, title)
 
     val pagerState = rememberPagerState(
@@ -155,8 +164,7 @@ fun BookDetailsScreen(
     )
 }
 
-private fun splitContentIntoPages(content: String): List<String> {
-    val maxWordsPerPage = 50
+private fun splitContentIntoPages(content: String, fontSize: Int, screenHeight: Dp, screenWidth: Dp): List<String> {
     val words = content.split(Regex("\\s+"))
     val pages = mutableListOf<String>()
 
@@ -164,13 +172,21 @@ private fun splitContentIntoPages(content: String): List<String> {
     var currentWordCount = 0
 
     for (word in words) {
-        if (currentWordCount + word.split(' ').size <= maxWordsPerPage) {
+        val wordsInCurrentWord = word.split(' ').size
+
+        val availableWidth = screenWidth - (16.dp)
+        val charsPerLine = (availableWidth / fontSize).value.toInt()
+        val maxLines = (screenHeight / fontSize).value.toInt()
+
+        val maxWordsPerPage = (charsPerLine * maxLines)/(fontSize/2)
+
+        if (currentWordCount + wordsInCurrentWord <= maxWordsPerPage) {
             currentPage.append("$word ")
-            currentWordCount += word.split(' ').size
+            currentWordCount += wordsInCurrentWord
         } else {
             pages.add(currentPage.toString().trim())
             currentPage = StringBuilder("$word ")
-            currentWordCount = word.split(' ').size
+            currentWordCount = wordsInCurrentWord
         }
     }
 

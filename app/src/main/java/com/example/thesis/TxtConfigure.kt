@@ -41,14 +41,14 @@ fun TxtConfigure(
     )
 
     val bgColors = mapOf(
-        "Red" to Color.Red,
-        "White" to Color.White,
-        "Black" to Color.Black,
-        "Yellow" to Color.Yellow
+        "Czarny" to MaterialTheme.colorScheme.surface,
+        "Biały" to Color.White,
+        "Czerwony" to Color.Red,
+        "Żółty" to Color.Yellow
     )
 
     val selectedFontText = remember { mutableStateOf("Arial") }
-    var selectedBackgroundColor = remember { mutableStateOf("0xd5a6bd") }
+    var selectedBackgroundColor = remember { mutableStateOf("Czarny") }
 
     Column {
         TopAppBar(
