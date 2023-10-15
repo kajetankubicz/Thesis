@@ -10,26 +10,34 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.thesis.BookManager.highlightSimilarLetters
 
 @Composable
-fun NavigationGraph(navController: NavHostController, context: Context, dodaneKsiazki: MutableList<BookInfo>, viewModel: OstatniaStrona.BookDetailsViewModel){
+fun NavigationGraph(navController: NavHostController, context: Context, addedBooks: MutableList<BookInfo>, viewModel: LastViewedPage.BookDetailsViewModel){
     val backStackEntry = navController.currentBackStackEntryAsState()
     val previousRoute = backStackEntry.value?.destination?.route
     NavHost(
         navController = navController,
-        startDestination = Nawigacja.Ksiazki.trasa
+        startDestination = Navigation.Books.path
 
     ) {
-        composable(route = Nawigacja.Ksiazki.trasa){
-            EkranKsiazek(navController, dodaneKsiazki)
+        composable(route = Navigation.Books.path){
+            BookScreen(navController, addedBooks)
         }
-        composable(route = Nawigacja.Informacje.trasa){
-            EkranInformacji(context)
+        composable(route = Navigation.Informations.path){
+            InfoScreen(context)
         }
         composable(
             route = "BookDetailsScreen/{title}/{content}") { backStackEntry ->
-            val tytul = backStackEntry.arguments?.getString("title") ?: ""
-            val tesc = Uri.decode(backStackEntry.arguments?.getString("content") ?: "")
+            val title  = backStackEntry.arguments?.getString("title") ?: ""
+            val content  = Uri.decode(backStackEntry.arguments?.getString("content") ?: "")
             val letterSpacingEnabled = backStackEntry.arguments?.getString("letterSpacingEnabled")?.toBoolean() ?: false
-            BookDetailsScreen(tytul, tesc, { navController.popBackStack() }, navController, viewModel, letterSpacingEnabled, highlightSimilarLetters)
+            BookDetailsScreen(
+                title,
+                content,
+                { navController.popBackStack() },
+                navController,
+                viewModel,
+                letterSpacingEnabled,
+                highlightSimilarLetters,
+                )
         }
         composable(route = "BooksScreen") {
             TxtConfigure(

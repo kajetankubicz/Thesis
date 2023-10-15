@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
@@ -27,10 +28,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
@@ -38,24 +39,23 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 
-object OstatniaStrona {
+object LastViewedPage {
     class BookDetailsViewModel : ViewModel() {
         var currentPage: Int = 0
-        var wybranaRodzinaCzcionki: FontFamily = FontFamily(Font(R.font.open_dyslexic3_bold))
+        var chooseFontFamily: FontFamily = FontFamily(Font(R.font.open_dyslexic3_bold))
     }
-    fun saveOstatniaStrona(context: Context, bookIdentifier: String, pageIndex: Int) {
+    fun saveLastPage(context: Context, title: String, pageIndex: Int) {
         val sharedPreferences = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
-        editor.putInt("OstatniaStrona_$bookIdentifier", pageIndex)
+        editor.putInt("OstatniaStrona_$title", pageIndex)
         editor.apply()
     }
 
-    fun getOstatniaStrona(context: Context, bookIdentifier: String): Int {
+    fun getLastPage(context: Context, title: String): Int {
         val sharedPreferences = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
-        return sharedPreferences.getInt("OstatniaStrona_$bookIdentifier", 0)
+        return sharedPreferences.getInt("OstatniaStrona_$title", 0)
     }
 }
-
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "UnrememberedMutableState")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -65,17 +65,17 @@ fun BookDetailsScreen(
     content: String,
     onNavigateBack: () -> Unit,
     navController: NavHostController,
-    viewModel: OstatniaStrona.BookDetailsViewModel,
+    viewModel: LastViewedPage.BookDetailsViewModel,
     letterSpacingEnabled: Boolean,
-    highlightSimilarLetters: Boolean
+    highlightSimilarLetters: Boolean,
+    bgColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.surface,
 ) {
-    val viewModel: OstatniaStrona.BookDetailsViewModel = viewModel()
+    val viewModel: LastViewedPage.BookDetailsViewModel = viewModel()
     val context = LocalContext.current
-    var wybranyRozmiarCzcionki by mutableStateOf(20.sp)
+    var chooseFontSize  by mutableStateOf(20.sp)
 
     val pages = splitContentIntoPages(content)
-    val bookIdentifier = title
-    val savedPageIndex = OstatniaStrona.getOstatniaStrona(context, bookIdentifier)
+    val savedPageIndex = LastViewedPage.getLastPage(context, title)
 
     val pagerState = rememberPagerState(
         initialPage = savedPageIndex,
@@ -87,7 +87,7 @@ fun BookDetailsScreen(
     DisposableEffect(pagerState.currentPage) {
         onDispose {
             viewModel.currentPage = pagerState.currentPage
-            OstatniaStrona.saveOstatniaStrona(context, bookIdentifier, pagerState.currentPage)
+            LastViewedPage.saveLastPage(context, title, pagerState.currentPage)
         }
     }
 
@@ -131,29 +131,23 @@ fun BookDetailsScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(top = it.calculateTopPadding())
-                        .background(Color.White),
+                        .background(BookManager.chooseBgColor ?: bgColor),
                     contentPadding = PaddingValues(16.dp)
                 ) {
                     item {
                         val letterSpacing = if (BookManager.letterSpacingEnabled) 0.2.em else 0.em
-                        val textWithHighlights = if (highlightSimilarLetters) {
-                            HighlightSimilarLettersText(
-                                pageContent,
-                                setOf('p', 'b', 'g', 'd', 'w', 'v')
-                            )
-                        } else {
-                            Text(
-                                text = pageContent,
-                                style = TextStyle(
-                                    fontFamily = BookManager.wybranaRodzinaCzcionki
-                                        ?: FontFamily.Default,
-                                    fontSize = BookManager.wybranyRozmiarCzcionki,
-                                    fontWeight = FontWeight.Normal,
-                                    letterSpacing = letterSpacing,
-                                ),
-                                modifier = Modifier.fillMaxWidth(),
-                            )
-                        }
+
+                        CustomText(
+                            text = pageContent,
+                            fontFamily = BookManager.chooseFontFamily  ?: FontFamily.Default,
+                            fontSize = BookManager.chooseFontSize,
+                            fontWeight = FontWeight.Normal,
+                            letterSpacing = letterSpacing,
+                            textColor = MaterialTheme.colorScheme.onSurface,
+                            highlightLetters = highlightSimilarLetters,
+                            modifier = Modifier.fillMaxWidth(1f),
+                            keyboard = KeyboardOptions.Default.copy(imeAction = ImeAction.None)
+                        )
                     }
                 }
             }
@@ -162,7 +156,7 @@ fun BookDetailsScreen(
 }
 
 private fun splitContentIntoPages(content: String): List<String> {
-    val maxWordsPerPage = 100
+    val maxWordsPerPage = 50
     val words = content.split(Regex("\\s+"))
     val pages = mutableListOf<String>()
 

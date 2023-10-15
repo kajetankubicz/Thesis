@@ -25,7 +25,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.thesis.BookManager.dodaneKsiazki
+import com.example.thesis.BookManager.addedBooks
 import nl.siegmann.epublib.epub.EpubReader
 import org.jsoup.Jsoup
 import java.io.IOException
@@ -35,7 +35,7 @@ import java.io.InputStream
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EkranGlowny(viewModel: OstatniaStrona.BookDetailsViewModel){
+fun MainScreen(viewModel: LastViewedPage.BookDetailsViewModel){
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination?.route
@@ -48,7 +48,7 @@ fun EkranGlowny(viewModel: OstatniaStrona.BookDetailsViewModel){
             }
         }
     ) {
-        NavigationGraph(navController = navController, context, dodaneKsiazki, viewModel)
+        NavigationGraph(navController = navController, context, addedBooks, viewModel)
     }
 }
 
@@ -92,8 +92,8 @@ fun readEpubFromInputStream(inputStream: InputStream): BookInfo {
 @Composable
 fun BottomBar(navController: NavHostController){
     val screens = listOf(
-        Nawigacja.Ksiazki,
-        Nawigacja.Informacje
+        Navigation.Books,
+        Navigation.Informations
     )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination?.route
@@ -110,16 +110,16 @@ fun BottomBar(navController: NavHostController){
 
 @Composable
 fun RowScope.AddItem(
-    screen: Nawigacja,
+    screen: Navigation,
     currentDestination: String?,
     navController: NavHostController
 ) {
-    val isSelected = currentDestination == screen.trasa
+    val isSelected = currentDestination == screen.path
 
     NavigationBarItem(
         selected = isSelected,
         onClick = {
-            navController.navigate(screen.trasa) {
+            navController.navigate(screen.path) {
                 popUpTo(navController.graph.findStartDestination().id)
                 launchSingleTop = true
             }
@@ -128,7 +128,7 @@ fun RowScope.AddItem(
             Box(
                 modifier = Modifier.clickable(
                     onClick = {
-                        navController.navigate(screen.trasa) {
+                        navController.navigate(screen.path) {
                             popUpTo(navController.graph.findStartDestination().id)
                             launchSingleTop = true
                         }
@@ -137,13 +137,13 @@ fun RowScope.AddItem(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = screen.ikona,
+                    imageVector = screen.icon,
                     contentDescription = "Navigation Icon",
                 )
             }
         },
         label = {
-            Text(text = screen.tytul)
+            Text(text = screen.title)
         },
         colors =  NavigationBarItemDefaults.colors(
             selectedIconColor = MaterialTheme.colorScheme.onSecondaryContainer,
