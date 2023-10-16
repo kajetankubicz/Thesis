@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Card
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import nl.siegmann.epublib.domain.Book
 import nl.siegmann.epublib.domain.Resource
 import nl.siegmann.epublib.epub.EpubReader
+import org.jsoup.Jsoup
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
@@ -69,7 +71,7 @@ fun InfoScreen(context: Context) {
 
 
 
-           /* selectedBook?.let { book ->
+            /*selectedBook?.let { book ->
                 LazyColumn {
                     item {
                         Text(text = "Title: ${book.title}", modifier = Modifier.padding(16.dp))
@@ -87,10 +89,10 @@ fun InfoScreen(context: Context) {
                             style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier.padding(16.dp)
                         )
-                        Text(text=Jsoup.parse(chapterContent).text(), style = MaterialTheme.typography.bodyMedium)
+                        Text(text= Jsoup.parse(chapterContent).text(), style = MaterialTheme.typography.bodyMedium)
                     }
                 }
-            } */
+            }*/
         }
 
     }

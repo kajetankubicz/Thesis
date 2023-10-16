@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -75,15 +76,13 @@ fun BookDetailsScreen(
     bgColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.surface,
 ) {
     val configuration = LocalConfiguration.current
-
     val screenHeight = configuration.screenHeightDp.dp
     val screenWidth = configuration.screenWidthDp.dp
-
     val viewModel: LastViewedPage.BookDetailsViewModel = viewModel()
     val context = LocalContext.current
     var chooseFontSize  by mutableStateOf(BookManager.chooseFontSize)
 
-    val pages = splitContentIntoPages(content, chooseFontSize.value.toInt(), screenHeight, screenWidth)
+    val pages = splitContentIntoPages(content, chooseFontSize.value.toInt(), screenHeight, screenWidth, letterSpacingEnabled)
     val savedPageIndex = LastViewedPage.getLastPage(context, title)
 
     val pagerState = rememberPagerState(
@@ -164,7 +163,7 @@ fun BookDetailsScreen(
     )
 }
 
-private fun splitContentIntoPages(content: String, fontSize: Int, screenHeight: Dp, screenWidth: Dp): List<String> {
+private fun splitContentIntoPages(content: String, fontSize: Int, screenHeight: Dp, screenWidth: Dp, letterSpacing: Boolean): List<String> {
     val words = content.split(Regex("\\s+"))
     val pages = mutableListOf<String>()
 
@@ -175,10 +174,14 @@ private fun splitContentIntoPages(content: String, fontSize: Int, screenHeight: 
         val wordsInCurrentWord = word.split(' ').size
 
         val availableWidth = screenWidth - (16.dp)
-        val charsPerLine = (availableWidth / fontSize).value.toInt()
+        val charsPerLine = if (letterSpacing) {
+            (availableWidth / (fontSize + 32)).value.toInt()
+        } else {
+            (availableWidth / fontSize).value.toInt()
+        }
         val maxLines = (screenHeight / fontSize).value.toInt()
 
-        val maxWordsPerPage = (charsPerLine * maxLines)/(fontSize/2)
+        val maxWordsPerPage = (charsPerLine * maxLines) / (fontSize / 2)
 
         if (currentWordCount + wordsInCurrentWord <= maxWordsPerPage) {
             currentPage.append("$word ")

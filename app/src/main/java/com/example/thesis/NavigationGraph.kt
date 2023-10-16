@@ -2,6 +2,7 @@ package com.example.thesis
 
 import android.content.Context
 import android.net.Uri
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -10,7 +11,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.thesis.BookManager.highlightSimilarLetters
 
 @Composable
-fun NavigationGraph(navController: NavHostController, context: Context, addedBooks: MutableList<BookInfo>, viewModel: LastViewedPage.BookDetailsViewModel){
+fun NavigationGraph(
+    navController: NavHostController,
+    context: Context,
+    addedBooks: MutableList<BookInfo>,
+    viewModel: LastViewedPage.BookDetailsViewModel
+){
     val backStackEntry = navController.currentBackStackEntryAsState()
     val previousRoute = backStackEntry.value?.destination?.route
     NavHost(

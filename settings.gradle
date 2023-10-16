@@ -3,9 +3,7 @@ pluginManagement {
         google()
         mavenCentral()
         gradlePluginPortal()
-        maven {
-            url 'https://github.com/psiegman/mvn-repo'
-        }
+        maven { url 'https://github.com/psiegman/mvn-repo'}
     }
 }
 dependencyResolutionManagement {

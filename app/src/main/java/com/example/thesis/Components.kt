@@ -25,9 +25,9 @@ import androidx.compose.ui.unit.TextUnit
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun CustomText(
+    modifier: Modifier = Modifier,
     text: String,
     onTextChange: (String) -> Unit = {},
-    modifier: Modifier = Modifier,
     fontFamily: FontFamily = FontFamily.SansSerif,
     fontSize: TextUnit,
     fontWeight: FontWeight? = null,
