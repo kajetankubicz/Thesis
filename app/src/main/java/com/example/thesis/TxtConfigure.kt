@@ -50,8 +50,10 @@ fun TxtConfigure(
     val bgColors = mapOf(
         "Czarny" to MaterialTheme.colorScheme.surface,
         "Biały" to Color.White,
-        "Czerwony" to Color.Red,
-        "Żółty" to Color.Yellow
+        "Czerwony" to Color(0xFFEC5452),
+        "Żółty" to Color(0xFFECC14F),
+        "Niebieski" to Color(0xFF52B9EC),
+        "Zielony" to Color(0xFF66AE60)
     )
 
     val selectedFontText = remember { mutableStateOf("Arial") }

@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -139,6 +140,7 @@ fun RowScope.AddItem(
                 Icon(
                     imageVector = screen.icon,
                     contentDescription = "Navigation Icon",
+                    tint = if (isSelected) Color(0xFFEC5452) else Color.Unspecified
                 )
             }
         },
