@@ -53,6 +53,8 @@ object BookManager {
     var letterSpacingEnabled by mutableStateOf(false)
     var highlightSimilarLetters by mutableStateOf(false)
     var chooseBgColor by mutableStateOf<Color?>(null)
+    var chooseTextColor by mutableStateOf<Color?>(Color.Black)
+    var syllableSpacing by mutableStateOf(false)
 
     fun toggleFavorite(bookInfo: BookInfo, context: Context) {
         bookInfo.isFavorite = !bookInfo.isFavorite

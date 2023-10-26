@@ -1,8 +1,10 @@
 package com.example.thesis
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -38,6 +40,8 @@ fun TxtConfigure(
     var letterSpacingEnabled by remember { mutableStateOf(false) }
     var highlightSimilarLetters by remember { mutableStateOf(false) }
     var isBackgroundColorExpanded by remember { mutableStateOf(false) }
+    var isTextColorExpanded by remember { mutableStateOf(false) }
+    var syllableSpacing by remember { mutableStateOf(false) }
 
     val fontFamilies = mapOf(
         "Arial" to FontFamily(Font(R.font.arial_th)),
@@ -48,7 +52,7 @@ fun TxtConfigure(
     )
 
     val bgColors = mapOf(
-        "Czarny" to MaterialTheme.colorScheme.surface,
+        "Czarny" to Color.Black,
         "Biały" to Color.White,
         "Czerwony" to Color(0xFFEC5452),
         "Żółty" to Color(0xFFECC14F),
@@ -56,10 +60,25 @@ fun TxtConfigure(
         "Zielony" to Color(0xFF66AE60)
     )
 
+    val txColors = mapOf(
+        "Czarny" to Color.Black,
+        "Biały" to Color.White,
+        "Czerwony" to Color(0xFFB81311),
+        "Pomarańczowy" to Color(0xFFFF8A00),
+        "Niebieski" to Color(0xFF1468b4),
+        "Zielony" to Color(0xFF41921e)
+    )
+
     val selectedFontText = remember { mutableStateOf("Arial") }
     var selectedBackgroundColor = remember { mutableStateOf("Czarny") }
+    val selectedTextColor = remember { mutableStateOf("Czarny") }
+    val scrollState = rememberScrollState()
 
-    Column {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(state = scrollState)
+    ) {
         TopAppBar(
             colors = TopAppBarDefaults.smallTopAppBarColors(
                 containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(6.dp)
@@ -196,96 +215,163 @@ fun TxtConfigure(
 
         var isFontSizeFocused by remember { mutableStateOf(false) }
 
-            OutlinedTextField(
-                value = BookManager.chooseFontSize.toString().replace(".0", "").replace(".sp", ""),
-                onValueChange = {
-                    val newSize = it.toIntOrNull()
-                    if (newSize != null) {
-                        BookManager.chooseFontSize = newSize.sp
+        OutlinedTextField(
+            value = BookManager.chooseFontSize.toString().replace(".0", "").replace(".sp", ""),
+            onValueChange = {
+                val newSize = it.toIntOrNull()
+                if (newSize != null) {
+                    BookManager.chooseFontSize = newSize.sp
+                }
+            },
+            readOnly = true,
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.None),
+            keyboardActions = KeyboardActions(onAny = {
+                keyboardController?.hide()
+            }),
+            trailingIcon = {
+                IconButton(
+                    onClick = { isSizeExpanded = !isSizeExpanded },
+                ) {
+                    Icon(
+                        Icons.Default.KeyboardArrowDown,
+                        contentDescription = "Toggle Dropdown",
+                    )
+                }
+            },
+            label = { Text(text = "Rozmiar czcionki") },
+            colors = TextFieldDefaults.textFieldColors(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .focusRequester(focusRequester)
+                .onFocusChanged {
+                    isFontSizeFocused = it.isFocused
+                    if (it.isFocused) {
+                        keyboardController?.hide()
                     }
                 },
-                readOnly = true,
-                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.None),
-                keyboardActions = KeyboardActions(onAny = {
-                    keyboardController?.hide()
-                }),
-                trailingIcon = {
-                    IconButton(
-                        onClick = { isSizeExpanded = !isSizeExpanded },
-                    ) {
-                        Icon(
-                            Icons.Default.KeyboardArrowDown,
-                            contentDescription = "Toggle Dropdown",
-                        )
-                    }
-                },
-                label = { Text(text = "Rozmiar czcionki") },
-                colors = TextFieldDefaults.textFieldColors(),
+        )
+
+        if (isSizeExpanded) {
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
-                    .focusRequester(focusRequester)
-                    .onFocusChanged {
-                        isFontSizeFocused = it.isFocused
-                        if (it.isFocused) {
-                            keyboardController?.hide()
-                        }
-                    },
-            )
-
-            if (isSizeExpanded) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                ) {
-                    Column {
-                        val fontSizes = listOf(14, 16, 18, 20, 22, 24, 26)
-                        fontSizes.forEach { fontSize ->
-                            DropdownMenuItem(
-                                text = {
-                                    Text(text = fontSize.toString())
-                                },
-                                onClick = {
-                                    BookManager.chooseFontSize = fontSize.sp
-                                    isSizeExpanded = false
-                                }
-                            )
-                        }
+                    .padding(horizontal = 16.dp)
+            ) {
+                Column {
+                    val fontSizes = listOf(14, 16, 18, 20, 22, 24, 26)
+                    fontSizes.forEach { fontSize ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(text = fontSize.toString())
+                            },
+                            onClick = {
+                                BookManager.chooseFontSize = fontSize.sp
+                                isSizeExpanded = false
+                            }
+                        )
                     }
                 }
             }
-            Row(
+        }
+        OutlinedTextField(
+            value = selectedTextColor.value,
+            onValueChange = {},
+            readOnly = true,
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.None),
+            keyboardActions = KeyboardActions(onAny = {
+                keyboardController?.hide()
+            }),
+            trailingIcon = {
+                IconButton(
+                    onClick = { isTextColorExpanded = !isTextColorExpanded },
+                ) {
+                    Icon(
+                        Icons.Default.KeyboardArrowDown,
+                        contentDescription = "Toggle Text Color Dropdown",
+                    )
+                }
+            },
+            label = { Text(text = "Kolor tekstu") },
+            colors = TextFieldDefaults.textFieldColors(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .focusRequester(focusRequester)
+                .onFocusChanged {
+                    isTextColorExpanded = it.isFocused
+                    if (it.isFocused) {
+                        keyboardController?.hide()
+                    }
+                },
+        )
+
+        if (isTextColorExpanded) {
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(horizontal = 16.dp)
             ) {
-                Text(text = "Przerwy między literami", modifier = Modifier.weight(1f))
-                Switch(
-                    checked = BookManager.letterSpacingEnabled,
-                    onCheckedChange = { newCheckedValue ->
-                        BookManager.letterSpacingEnabled = newCheckedValue
+                Column {
+                    txColors.forEach { (colorName, txColor) ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(text = colorName)
+                            },
+                            onClick = {
+                                BookManager.chooseTextColor = txColor
+                                selectedTextColor.value = colorName
+                                isTextColorExpanded = false
+                            }
+                        )
                     }
-                )
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(text = "Wyróżnij podobne litery", modifier = Modifier.weight(1f))
-                Switch(
-                    checked = BookManager.highlightSimilarLetters,
-                    onCheckedChange = { newCheckedValue ->
-                        BookManager.highlightSimilarLetters = newCheckedValue
-                    }
-                )
+                }
             }
         }
-
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = "Przerwy między literami", modifier = Modifier.weight(1f))
+            Switch(
+                checked = BookManager.letterSpacingEnabled,
+                onCheckedChange = { newCheckedValue ->
+                    BookManager.letterSpacingEnabled = newCheckedValue
+                }
+            )
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(14.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = "Wyróżnij podobne litery", modifier = Modifier.weight(1f))
+            Switch(
+                checked = BookManager.highlightSimilarLetters,
+                onCheckedChange = { newCheckedValue ->
+                    BookManager.highlightSimilarLetters = newCheckedValue
+                }
+            )
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(14.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = "Przerwy między sylabami", modifier = Modifier.weight(1f))
+            Switch(
+                checked = BookManager.syllableSpacing,
+                onCheckedChange = { newCheckedValue ->
+                    BookManager.syllableSpacing = newCheckedValue
+                }
+            )
+        }
     }
+}
 
 
 

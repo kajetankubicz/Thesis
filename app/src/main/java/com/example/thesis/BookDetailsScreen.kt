@@ -44,6 +44,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 
+
 object LastViewedPage {
     class BookDetailsViewModel : ViewModel() {
         var currentPage: Int = 0
@@ -145,17 +146,19 @@ fun BookDetailsScreen(
                     item {
                         val letterSpacing = if (BookManager.letterSpacingEnabled) 0.2.em else 0.em
 
-                        CustomText(
-                            text = pageContent,
-                            fontFamily = BookManager.chooseFontFamily  ?: FontFamily.Default,
-                            fontSize = BookManager.chooseFontSize,
-                            fontWeight = FontWeight.Normal,
-                            letterSpacing = letterSpacing,
-                            textColor = MaterialTheme.colorScheme.onSurface,
-                            highlightLetters = highlightSimilarLetters,
-                            modifier = Modifier.fillMaxWidth(1f),
-                            keyboard = KeyboardOptions.Default.copy(imeAction = ImeAction.None),
-                        )
+                        BookManager.chooseTextColor?.let { it1 ->
+                            CustomText(
+                                text = pageContent,
+                                fontFamily = BookManager.chooseFontFamily  ?: FontFamily.Default,
+                                fontSize = BookManager.chooseFontSize,
+                                fontWeight = FontWeight.Normal,
+                                letterSpacing = letterSpacing,
+                                textColor = it1,
+                                highlightLetters = highlightSimilarLetters,
+                                modifier = Modifier.fillMaxWidth(1f),
+                                keyboard = KeyboardOptions.Default.copy(imeAction = ImeAction.None),
+                            )
+                        }
                     }
                 }
             }
