@@ -9,7 +9,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.thesis.BookManager.highlightSimilarLetters
+import com.google.accompanist.pager.ExperimentalPagerApi
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun NavigationGraph(
     navController: NavHostController,
@@ -28,7 +30,10 @@ fun NavigationGraph(
             BookScreen(navController, addedBooks)
         }
         composable(route = Navigation.Informations.path){
-            InfoScreen(context)
+            InfoScreen(navController, context)
+        }
+        composable(route = Navigation.Walkthrough.path){
+            Walkthrough(navController)
         }
         composable(
             route = "BookDetailsScreen/{title}/{content}") { backStackEntry ->

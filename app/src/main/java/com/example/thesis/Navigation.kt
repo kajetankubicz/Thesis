@@ -13,12 +13,17 @@ sealed class Navigation(
 ){
     object Books: Navigation(
         path = "books",
-        title = "Books",
+        title = "Książki",
         icon = Icons.Default.Home
     )
     object Informations: Navigation(
         path = "informations",
-        title = "Informations",
+        title = "Informacje",
+        icon = Icons.Default.Info
+    )
+    object Walkthrough: Navigation(
+        path = "walkthrough",
+        title = "Samouczek",
         icon = Icons.Default.Info
     )
 }

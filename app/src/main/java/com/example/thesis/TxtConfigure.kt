@@ -103,6 +103,7 @@ fun TxtConfigure(
         OutlinedTextField(
             value = selectedFontText.value,
             onValueChange = {},
+            textStyle = LocalTextStyle.current.copy(fontSize = 18.sp),
             readOnly = true,
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.None),
             keyboardActions = KeyboardActions(onAny = {
@@ -142,7 +143,7 @@ fun TxtConfigure(
                     fontFamilies.forEach { (fontName, fontFamily) ->
                         DropdownMenuItem(
                             text = {
-                                Text(text = fontName)
+                                Text(text = fontName, fontSize = 18.sp)
                             },
                             onClick = {
                                 BookManager.chooseFontFamily = fontFamily
@@ -160,6 +161,7 @@ fun TxtConfigure(
         OutlinedTextField(
             value = selectedBackgroundColor.value,
             onValueChange = {},
+            textStyle = LocalTextStyle.current.copy(fontSize = 18.sp),
             readOnly = true,
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.None),
             keyboardActions = KeyboardActions(onAny = {
@@ -199,7 +201,7 @@ fun TxtConfigure(
                     bgColors.forEach { (colorName, bgColor) ->
                         DropdownMenuItem(
                             text = {
-                                Text(text = colorName)
+                                Text(text = colorName, fontSize = 18.sp)
                             },
                             onClick = {
                                 BookManager.chooseBgColor = bgColor
@@ -223,6 +225,7 @@ fun TxtConfigure(
                     BookManager.chooseFontSize = newSize.sp
                 }
             },
+            textStyle = LocalTextStyle.current.copy(fontSize = 18.sp),
             readOnly = true,
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.None),
             keyboardActions = KeyboardActions(onAny = {
@@ -263,7 +266,7 @@ fun TxtConfigure(
                     fontSizes.forEach { fontSize ->
                         DropdownMenuItem(
                             text = {
-                                Text(text = fontSize.toString())
+                                Text(text = fontSize.toString(), fontSize = 18.sp)
                             },
                             onClick = {
                                 BookManager.chooseFontSize = fontSize.sp
@@ -277,6 +280,7 @@ fun TxtConfigure(
         OutlinedTextField(
             value = selectedTextColor.value,
             onValueChange = {},
+            textStyle = LocalTextStyle.current.copy(fontSize = 18.sp),
             readOnly = true,
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.None),
             keyboardActions = KeyboardActions(onAny = {
@@ -316,7 +320,7 @@ fun TxtConfigure(
                     txColors.forEach { (colorName, txColor) ->
                         DropdownMenuItem(
                             text = {
-                                Text(text = colorName)
+                                Text(text = colorName, fontSize = 18.sp)
                             },
                             onClick = {
                                 BookManager.chooseTextColor = txColor
@@ -334,7 +338,7 @@ fun TxtConfigure(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "Przerwy między literami", modifier = Modifier.weight(1f))
+            Text(text = "Przerwy między literami", modifier = Modifier.weight(1f), fontSize = 18.sp)
             Switch(
                 checked = BookManager.letterSpacingEnabled,
                 onCheckedChange = { newCheckedValue ->
@@ -348,7 +352,7 @@ fun TxtConfigure(
                 .padding(14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "Wyróżnij podobne litery", modifier = Modifier.weight(1f))
+            Text(text = "Wyróżnij podobne litery", modifier = Modifier.weight(1f), fontSize = 18.sp)
             Switch(
                 checked = BookManager.highlightSimilarLetters,
                 onCheckedChange = { newCheckedValue ->
@@ -362,7 +366,7 @@ fun TxtConfigure(
                 .padding(14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "Przerwy między sylabami", modifier = Modifier.weight(1f))
+            Text(text = "Przerwy między sylabami", modifier = Modifier.weight(1f), fontSize = 18.sp)
             Switch(
                 checked = BookManager.syllableSpacing,
                 onCheckedChange = { newCheckedValue ->

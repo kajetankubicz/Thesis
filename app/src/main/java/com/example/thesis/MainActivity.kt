@@ -9,9 +9,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.example.thesis.ui.theme.ThesisTheme
 import androidx.compose.foundation.layout.fillMaxSize
+import com.google.accompanist.pager.ExperimentalPagerApi
 
 
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalPagerApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

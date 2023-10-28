@@ -140,7 +140,7 @@ fun RowScope.AddItem(
                 Icon(
                     imageVector = screen.icon,
                     contentDescription = "Navigation Icon",
-                    tint = if (isSelected) Color(0xFFEC5452) else Color.Unspecified
+                    tint = if (isSelected) Color(0xFFEC5452) else MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         },
