@@ -51,32 +51,17 @@ fun InfoScreen(
             .background(MaterialTheme.colorScheme.surface)
     ) {
         Column {
-            Card(modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            border = BorderStroke(2.dp, color = MaterialTheme.colorScheme.onSurface),
-                content = {
-                    Text(
-                        modifier = Modifier
-                            .padding(10.dp),
-                        text = "Aplikacja czytnika e-booków dla dzieci z dysleksją rozwojową",
-                        style = TextStyle(
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontSize = 20.sp,
-                            fontFamily = FontFamily.Monospace,
-                            fontWeight = FontWeight.W800,
-                            fontStyle = FontStyle.Italic,
-                            letterSpacing = 0.10.em,
-                        )
-                    )
-                }
-            )
-            Spacer(modifier = Modifier.size(10.dp))
-
-            Text(text = "Opiekun pracy: dr inż. Michał Wróbel", modifier = Modifier.padding(16.dp),fontSize = 25.sp)
-            Text(text = "Dyplomanci: Renata Bańka, Kajetan Kubicz", modifier = Modifier.padding(16.dp),fontSize = 25.sp)
 
             Spacer(modifier = Modifier.size(10.dp))
+            Text(text = "Praca dymplomowa: Aplikacja czytnika e-booków dla dzieci z dysleksją rozwojową", modifier = Modifier.padding(16.dp),fontSize = 20.sp, fontWeight = FontWeight.W700)
+
+            Spacer(modifier = Modifier.size(10.dp))
+            Text(text = "Opiekun pracy: dr inż. Michał Wróbel", modifier = Modifier.padding(16.dp),fontSize = 20.sp, fontWeight = FontWeight.W700)
+
+            Spacer(modifier = Modifier.size(10.dp))
+            Text(text = "Dyplomanci: Renata Bańka, Kajetan Kubicz", modifier = Modifier.padding(16.dp),fontSize = 20.sp, fontWeight = FontWeight.W700)
+
+            Spacer(modifier = Modifier.size(20.dp))
 
             Button(
                 modifier = Modifier.fillMaxWidth().padding(32.dp),

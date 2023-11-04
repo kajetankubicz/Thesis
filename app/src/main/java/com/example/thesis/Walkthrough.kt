@@ -4,6 +4,7 @@ import android.service.autofill.OnClickAction
 import androidx.annotation.FloatRange
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -45,25 +47,41 @@ fun Walkthrough(
 
     items.add(
         WalkthroughData(
-            R.raw.lottie_cat,
-            "Title 1",
-            "Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document or a typeface."
+            R.drawable.intro1,
+            "Jak dodać książki?",
+            "W zakładce książki kliknij w znak  \"+\", po czym wybierz plik ePub z pamięci telefonu"
         )
     )
 
     items.add(
         WalkthroughData(
-            R.raw.lottie_cat,
-            "Title 2",
-            "Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document or a typeface."
+            R.drawable.intro2,
+            "Jak usunąć książki?",
+            "Przytrzymaj okładę książki, by wyświetlić menu, które pozwoli na usunięcie książki z biblioteki"
         )
     )
 
     items.add(
         WalkthroughData(
-            R.raw.lottie_cat,
-            "Title 3",
-            "Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document or a typeface."
+            R.drawable.intro3,
+            "Jak otworzyć książkę?",
+            "Kliknij w okładkę książki by cieszyć się z jej treści"
+        )
+    )
+
+    items.add(
+        WalkthroughData(
+            R.drawable.intro4,
+            "Jak spersonalizować książkę?",
+            "Po otwarciu książki, kliknij w trzykropki w prawym górym rogu by otwrzyć okno personalizacji"
+        )
+    )
+
+    items.add(
+        WalkthroughData(
+            R.drawable.intro5,
+            "Jak dodać książkę do ulubionych?",
+            "Kliknij w znaczek gwiazki na okładce by dodać książki do ulubionych, wtedy wyświetli się u góry listy książek"
         )
     )
 
@@ -99,34 +117,30 @@ fun Walkthrough(
                 ) { page ->
                     Column(
                         modifier = Modifier
-                            .padding(60.dp)
+                            .padding(40.dp)
                             .fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        /* Image(
-                             painter = painterResource(id = item[page].image),
-                             contentDescription = item[page].title,
-                             modifier = Modifier
-                                 .height(250.dp)
-                                 .fillMaxWidth()
-                         )*/
                         LoaderIntro(
                             modifier = Modifier
-                                .size(200.dp)
+                                .size(300.dp)
                                 .fillMaxWidth()
-                                .align(alignment = Alignment.CenterHorizontally),item[page].image)
+                                .border(3.dp, Color.Black)
+                                .align(alignment = Alignment.CenterHorizontally),item[page].image
+                        )
+
                         Text(
                             text = item[page].title,
                             modifier = Modifier.padding(top = 50.dp),
                             color = Color.Black,
-                            style = androidx.compose.material3.MaterialTheme.typography.headlineSmall,
+                            style = MaterialTheme.typography.labelLarge,
                         )
 
                         Text(
                             text = item[page].desc,
-                            modifier = Modifier.padding(top = 30.dp, start = 20.dp, end = 20.dp),
+                            modifier = Modifier.padding(top = 30.dp, start = 20.dp),
                             color = Color.Black,
-                            style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
+                            style = MaterialTheme.typography.bodyMedium,
                             textAlign = TextAlign.Center
                         )
                     }
@@ -165,7 +179,7 @@ fun Walkthrough(
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.padding(top = 60.dp)
+            modifier = Modifier.padding(top = 20.dp)
         ) {
             repeat(size) {
                 Indicator(isSelected = it == currentPage)

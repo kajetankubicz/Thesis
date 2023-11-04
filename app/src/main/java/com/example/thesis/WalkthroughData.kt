@@ -18,12 +18,9 @@ data class WalkthroughData(val image: Int, val title: String, val desc: String)
 
 @Composable
 fun LoaderIntro(modifier: Modifier, image: Int) {
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(image))
-    val progress by animateLottieCompositionAsState(composition)
-    LottieAnimation(
-        composition = composition,
-        iterations = LottieConstants.IterateForever,
-        //progress = { progress },
+    Image(
+        painter = painterResource(id = image),
+        contentDescription = null, // You can set a proper content description if needed
         modifier = modifier
     )
 }
