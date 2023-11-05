@@ -39,11 +39,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-fun Int.toPx(): Int = (this * Resources.getSystem().displayMetrics.density).toInt()
-fun Int.toDp(): Int = (this / Resources.getSystem().displayMetrics.density).toInt()
 
 object LastViewedPage {
     class BookDetailsViewModel : ViewModel() {
@@ -78,13 +77,13 @@ fun BookDetailsScreen(
     textColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSurface
 ) {
     val configuration = LocalConfiguration.current
-    val screenHeight = configuration.screenHeightDp.dp
-    val screenWidth = configuration.screenWidthDp.dp
+    val screenHeight = configuration.screenHeightDp.toFloat()
+    val screenWidth = configuration.screenWidthDp.toFloat()
     val viewModel: LastViewedPage.BookDetailsViewModel = viewModel()
     val context = LocalContext.current
     var chooseFontSize  by mutableStateOf(BookManager.chooseFontSize)
 
-    val pages = splitContentIntoPages(content, chooseFontSize.value.toInt(), screenHeight, screenWidth, BookManager.letterSpacingEnabled, BookManager.chooseFontFamily)
+    val pages = splitContentIntoPages(content, chooseFontSize.value, screenHeight, screenWidth, BookManager.letterSpacingEnabled, BookManager.chooseFontFamily)
     val savedPageIndex = LastViewedPage.getLastPage(context, title)
 
     val pagerState = rememberPagerState(
@@ -133,17 +132,16 @@ fun BookDetailsScreen(
         content = {
             HorizontalPager(
                 state = pagerState,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().fillMaxWidth(),
             ) { page ->
                 val pageContent = pages[page]
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
+                        .fillMaxWidth()
                         .padding(top = it.calculateTopPadding())
                         .background(BookManager.chooseBgColor ?: bgColor),
                     contentPadding = PaddingValues(16.dp),
-                    horizontalAlignment = Alignment.Start,
-                    verticalArrangement = Arrangement.Top
                 ) {
                     item {
                         val letterSpacing = if (BookManager.letterSpacingEnabled) 0.2.em else 0.em
@@ -166,42 +164,30 @@ fun BookDetailsScreen(
     )
 }
 
+
 private fun splitContentIntoPages(
     content: String,
-    fontSize: Int,
-    screenHeight: Dp,
-    screenWidth: Dp,
+    fontSize: Float,
+    screenHeight: Float,
+    screenWidth: Float,
     letterSpacing: Boolean,
-    fontFamily: FontFamily?
+    fontFamily: FontFamily?,
 ): List<String> {
     val words = content.split(Regex("\\s+"))
     val pages = mutableListOf<String>()
 
-    val charsPerLine: Dp
-    val linesPerPage: Dp
-
-    Log.d("font1", BookManager.chooseFontFamily.toString())
-
-    if (fontFamily == FontFamily(Font(2131230720))) { //Arial
-        charsPerLine = if (!letterSpacing) ((screenWidth + 64.dp) / fontSize) else ((screenWidth + 192.dp) / fontSize)
-        linesPerPage = (screenHeight / (fontSize * 2.5.toInt()))
-    } else if (fontFamily == FontFamily(Font(2131230730))) { // OpenDyslexic
-        charsPerLine = if (!letterSpacing) ((screenWidth) / fontSize) else ((screenWidth + 160.dp) / fontSize)
-        linesPerPage = (screenHeight / (fontSize * 4.5.toInt()))
-    } else if (fontFamily == FontFamily(Font(2131230725))) { // Helvetica
-        charsPerLine = if (!letterSpacing) ((screenWidth + 128.dp) / fontSize) else ((screenWidth + 224.dp) / fontSize)
-        linesPerPage = (screenHeight / (fontSize * 2))
-    } else if (fontFamily == FontFamily(Font(2131230732))) { // Verdana
-        charsPerLine = if (!letterSpacing) ((screenWidth + 64.dp) / fontSize) else ((screenWidth + 256.dp) / fontSize)
-        linesPerPage = (screenHeight / (fontSize * 3))
-    } else if (fontFamily == FontFamily(Font(2131230724))) { // Courier
-        charsPerLine = if (!letterSpacing) ((screenWidth + 64.dp) / fontSize) else ((screenWidth + 224.dp) / fontSize)
-        linesPerPage = (screenHeight / (fontSize * 2))
-    } else{
-        charsPerLine = if (!letterSpacing) ((screenWidth + 128.dp) / fontSize) else ((screenWidth + 224.dp) / fontSize)
-        linesPerPage = (screenHeight / (fontSize * 2))
-
+    val charSpacing: Float = if (letterSpacing) 192f else 64f
+    val lineHeightFactor = when (fontFamily) {
+        FontFamily(Font(2131230720)) -> 2.1 //Arial
+        FontFamily(Font(2131230730)) -> 6.5 //Open
+        FontFamily(Font(2131230725)) -> 1.7 //Helvetica
+        FontFamily(Font(2131230732)) -> 2.8 //Verdana
+        FontFamily(Font(2131230724)) -> 2.0 //Courier
+        else -> 2.0
     }
+
+    val charsPerLine = (screenWidth + charSpacing) / fontSize
+    val linesPerPage = screenHeight / (fontSize * lineHeightFactor).toInt()
 
     var currentPage = StringBuilder()
     var currentCharCount = 0
@@ -210,10 +196,10 @@ private fun splitContentIntoPages(
     for (word in words) {
         val wordLength = word.length + if (letterSpacing) word.length - 1 else 0
 
-        if (currentCharCount + wordLength <= charsPerLine.value) {
+        if (currentCharCount + wordLength <= charsPerLine) {
             currentPage.append("$word ")
             currentCharCount += wordLength
-        } else if (currentLineCount < linesPerPage.value) {
+        } else if (currentLineCount < linesPerPage) {
             currentPage.append("\n$word ")
             currentCharCount = wordLength
             currentLineCount++
@@ -231,5 +217,6 @@ private fun splitContentIntoPages(
 
     return pages
 }
+
 
 

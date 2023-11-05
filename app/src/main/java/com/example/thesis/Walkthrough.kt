@@ -97,7 +97,7 @@ fun Walkthrough(
         pagerState = pagerState,
         modifier = Modifier
             .fillMaxSize()
-            .background(color = Color.White)
+            .background(color = MaterialTheme.colorScheme.surface)
     )
 }
 
@@ -125,21 +125,20 @@ fun Walkthrough(
                             modifier = Modifier
                                 .size(300.dp)
                                 .fillMaxWidth()
-                                .border(3.dp, Color.Black)
                                 .align(alignment = Alignment.CenterHorizontally),item[page].image
                         )
 
                         Text(
                             text = item[page].title,
                             modifier = Modifier.padding(top = 50.dp),
-                            color = Color.Black,
+                            color = MaterialTheme.colorScheme.onSurface,
                             style = MaterialTheme.typography.labelLarge,
                         )
 
                         Text(
                             text = item[page].desc,
                             modifier = Modifier.padding(top = 30.dp, start = 20.dp),
-                            color = Color.Black,
+                            color = MaterialTheme.colorScheme.onSurface,
                             style = MaterialTheme.typography.bodyMedium,
                             textAlign = TextAlign.Center
                         )
