@@ -32,13 +32,13 @@ fun CustomText(
     fontSize: TextUnit,
     fontWeight: FontWeight? = null,
     letterSpacing: TextUnit,
-    textColor: androidx.compose.ui.graphics.Color,
+    textColor: Color,
     highlightLetters: Boolean = false,
     onImeAction: () -> Unit = {},
     keyboard: KeyboardOptions,
 ) {
 
-    val letterColor = if (highlightLetters) MaterialTheme.colorScheme.error else textColor
+    val letterColor = if (highlightLetters) Color.Red else textColor
     val keyboardController = LocalSoftwareKeyboardController.current
 
 
@@ -46,7 +46,7 @@ fun CustomText(
         Text(
             buildAnnotatedString {
                 for (char in text) {
-                    withStyle(style = SpanStyle(color = if (char in "pbgdwv") MaterialTheme.colorScheme.error else textColor)) {
+                    withStyle(style = SpanStyle(color = if (char in "pbgdwv") Color.Red else textColor)) {
                         append(char.toString())
                     }
                 }

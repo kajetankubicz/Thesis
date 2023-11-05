@@ -1,5 +1,6 @@
 package com.example.thesis
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
@@ -18,15 +19,12 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -41,10 +39,9 @@ fun TxtConfigure(
     var highlightSimilarLetters by remember { mutableStateOf(false) }
     var isBackgroundColorExpanded by remember { mutableStateOf(false) }
     var isTextColorExpanded by remember { mutableStateOf(false) }
-    var syllableSpacing by remember { mutableStateOf(false) }
 
     val fontFamilies = mapOf(
-        "Arial" to FontFamily(Font(R.font.arial_th)),
+        "Arial" to FontFamily(Font(R.font.arial_geo_bold)),
         "Open dyslexic" to FontFamily(Font(R.font.open_dyslexic3_bold)),
         "Helvetica" to FontFamily(Font(R.font.helvetica)),
         "Verdana" to FontFamily(Font(R.font.verdana)),
@@ -70,8 +67,17 @@ fun TxtConfigure(
     )
 
     val selectedFontText = remember { mutableStateOf("Arial") }
-    var selectedBackgroundColor = remember { mutableStateOf("Czarny") }
-    val selectedTextColor = remember { mutableStateOf("Czarny") }
+
+    val isSystemDarkMode = isSystemInDarkTheme()
+
+    val selectedBackgroundColor = remember {
+        mutableStateOf(if (isSystemDarkMode) "Czarny" else "Biały")
+    }
+
+    val selectedTextColor = remember {
+        mutableStateOf(if (isSystemDarkMode) "Biały" else "Czarny")
+    }
+
     val scrollState = rememberScrollState()
 
     Column(
@@ -357,20 +363,6 @@ fun TxtConfigure(
                 checked = BookManager.highlightSimilarLetters,
                 onCheckedChange = { newCheckedValue ->
                     BookManager.highlightSimilarLetters = newCheckedValue
-                }
-            )
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(14.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(text = "Przerwy między sylabami", modifier = Modifier.weight(1f), fontSize = 18.sp)
-            Switch(
-                checked = BookManager.syllableSpacing,
-                onCheckedChange = { newCheckedValue ->
-                    BookManager.syllableSpacing = newCheckedValue
                 }
             )
         }

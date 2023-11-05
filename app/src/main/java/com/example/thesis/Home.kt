@@ -28,6 +28,7 @@ import androidx.compose.foundation.*
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.ui.modifier.modifierLocalConsumer
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.sp
 import com.airbnb.lottie.compose.LottieAnimation
@@ -53,8 +54,7 @@ object BookManager {
     var letterSpacingEnabled by mutableStateOf(false)
     var highlightSimilarLetters by mutableStateOf(false)
     var chooseBgColor by mutableStateOf<Color?>(null)
-    var chooseTextColor by mutableStateOf<Color?>(Color.Black)
-    var syllableSpacing by mutableStateOf(false)
+    var chooseTextColor by mutableStateOf<Color?>(null)
 
     fun toggleFavorite(bookInfo: BookInfo, context: Context) {
         bookInfo.isFavorite = !bookInfo.isFavorite
